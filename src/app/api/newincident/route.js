@@ -32,6 +32,7 @@ export async function POST(request){
     return NextResponse.json({message: "data stored successfully"},{status: 200});
 
   } catch (error) {
+    console.error('Error saving new incident:', error);
     return NextResponse.json({message: "Internal server error"}, {status: 500});
   }
 }

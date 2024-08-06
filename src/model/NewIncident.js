@@ -27,7 +27,7 @@ const newIncidentSchema = new mongoose.Schema({
         required: false,
     },    
     assignedTo: {
-        type: String,
+        type: [String],
         required: false,
     },    
     status: {

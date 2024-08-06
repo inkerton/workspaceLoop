@@ -6,6 +6,11 @@ import {
   MenuItem,
   Box,
   Typography,
+  FormControl,
+  InputLabel,
+  Select ,
+  OutlinedInput ,
+  Chip,
   Grid,
 } from '@mui/material';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
@@ -16,18 +21,42 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import axios from 'axios';
 import { DatePicker } from '@mui/x-date-pickers';
+import { useTheme } from '@mui/material/styles';
 
 const filter = createFilterOptions();
 
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
+
+function getStyles(name, personName, theme) {
+  return {
+    fontWeight:
+      personName.indexOf(name) === -1
+        ? theme.typography.fontWeightRegular
+        : theme.typography.fontWeightMedium,
+  };
+}
+
 
 function NewIncident() {
+  const theme = useTheme();
   const [incidentNo, setIncidentNo] = useState('');
   const [inputSource, setInputSource] = useState(null);
   const [dateOfInput, setDateOfInput] = useState(null);
   const [entityImpacted, setEntityImpacted] = useState(null);
   const [category, setCategory] = useState('');
   const [brief, setBrief] = useState('');
-  const [assignedTo, setAssignedTo] = useState(null);
+  const [assignedTo, setAssignedTo] = useState([]);
+  const [personName, setPersonName] = useState([]);
+  const [names, setNames] = useState([]);
   const [comment, setComment] = useState('');
   const [ status, setStatus] = useState('ASSIGNED');
   const [index, setIndex] = useState(0);
@@ -37,10 +66,7 @@ function NewIncident() {
     'shyam',
   ]);
 
-  const [assignedToOptions, setAssignedToOptions] = useState([
-    'person1',
-    'person2',
-    ])
+  const [assignedToOptions, setAssignedToOptions] = useState([])
 
   const [ entityImpactedOptions, setEntityImpactedOptions ] = useState([
     'entity1',
@@ -48,6 +74,25 @@ function NewIncident() {
     'rbi',
   ])
 
+  const getUsers = async ()=>{
+    try {
+      const response = await axios.get('/api/auth');
+      const data = response.data.data;
+      console.log(data);
+      if(response.status == 200){
+        const userOptions = data.map(user => user.username);
+        console.log(userOptions);
+        setAssignedToOptions(userOptions);
+        setNames(userOptions);
+        alert("data fetched successfully");
+      } else {
+        alert("could not get document count");
+      }
+
+    } catch(error) {
+      console.log(error);
+    }
+  };
 
   const getIncidentsCount = async ()=>{
     try {
@@ -68,6 +113,7 @@ function NewIncident() {
 
   useEffect(()=> {
     getIncidentsCount();
+    getUsers();
   }, []);
 
   useEffect(() => {
@@ -86,13 +132,28 @@ function NewIncident() {
     if(!entityImpactedOptions.includes(newName)) {
       setEntityImpactedOptions([...entityImpactedOptions, newName]);
     }
-  }
+  };
 
   const handleNewAssignedTo = ( newName ) => {
-    if(!assignedToOptions.includes(newName)) {
-      setAssignedToOptions([...assignedToOptions, newName]);
+    if(!assignedTo.includes(newName)) {
+      setAssignedTo([...assignedTo, newName]);
     }
-  }
+  };
+
+  const handleChange = (event) => {
+    const {
+      target: { value },
+    } = event;
+    setPersonName(
+      // On autofill we get a stringified value.
+      typeof value === 'string' ? value.split(',') : value,
+    );
+    console.log(personName);  
+    // setAssignedTo(personName);
+    // console.log('ass  ',assignedTo)
+  };
+
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -390,16 +451,17 @@ function NewIncident() {
                 <Autocomplete
                   fullWidth
                   freeSolo
+                  multiple
                   options={assignedToOptions}
                   value={assignedTo}
                   onInputChange={(event, newValue) => setAssignedTo(newValue)}
                   onChange={(event, newValue) => {
                     if (typeof newValue === 'string') {
                       handleNewAssignedTo(newValue);
-                      setAssignedTo(newValue);
+                      setAssignedTo([...assignedTo, newValue]);
                     } else if (newValue && newValue.inputValue) {
                       handleNewAssignedTo(newValue.inputValue);
-                      setAssignedTo(newValue.inputValue);
+                      setAssignedTo([...assignedTo, newValue.inputValue]);
                     } else {
                       setAssignedTo(newValue);
                     }
@@ -450,6 +512,49 @@ function NewIncident() {
 
               </Box>
             </Grid>
+
+            {/* <Grid item xs={12}>
+            <Box className="flex" sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+              <Grid item xs={3}>
+                <Typography variant="h6">
+                  Assigned To:
+                </Typography>
+              </Grid>
+              <Grid item xs={9}>
+              <div>
+              <FormControl sx={{ m: 1, width: 300 }}>
+                <InputLabel id="demo-multiple-chip-label">Chip</InputLabel>
+                <Select
+                  labelId="demo-multiple-chip-label"
+                  id="demo-multiple-chip"
+                  multiple
+                  value={personName}
+                  onChange={handleChange}
+                  input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
+                  renderValue={(selected) => (
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                      {selected.map((value) => (
+                        <Chip key={value} label={value} />
+                      ))}
+                    </Box>
+                  )}
+                  MenuProps={MenuProps}
+                >
+                  {names.map((name) => (
+                    <MenuItem
+                      key={name}
+                      value={name}
+                      style={getStyles(name, personName, theme)}
+                    >
+                      {name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </div>
+              </Grid>
+            </Box>
+          </Grid> */}
 
             <Grid item xs={12}>
               <Box className="flex" sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>

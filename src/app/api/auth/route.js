@@ -57,9 +57,15 @@ export async function POST(request) {
 
 export async function GET(request){
     try {
-
-    } 
-    catch (error) {
-
-    }
+        const users = await User.find();
+    
+        if (!users) {
+          return NextResponse.json({message: "No users present"}, {status: 500});  
+        } 
+        
+        return NextResponse.json({data: users}, {status: 200});
+      } catch(error) {
+        console.log(error)
+        return NextResponse.json({message: "Error while getting incidents"}, {status: 500});
+      }
 }
