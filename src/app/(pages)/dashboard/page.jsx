@@ -10,6 +10,7 @@ import { DatePicker } from '@mui/x-date-pickers';
 import { get } from 'http';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import Footer from '@/app/components/Footer';
 
 // Mock Data
 // import { data } from './makeData';
@@ -19,6 +20,14 @@ const Dashboard = () => {
   const router = useRouter();
 
   const [incidentsData, setIncidentsData] = useState([]);
+  const statusMap = {
+    ASSIGNED: 'Assigned',
+    UNASSIGNED: 'Unassigned',
+    INFORMATION_AWAITED: 'Information Awaited',
+    PROCESSING: 'Processing',
+    TEAM_SENT: 'Team Sent',
+    REPORT_BEING_PREPARED: 'Report Being Prepared',
+  };
 
   const columns = useMemo(
     () => [
@@ -27,14 +36,15 @@ const Dashboard = () => {
             emableClickToCopy: true,
             filterVariant: 'autocomplete',
             header: 'incident ID',
-            size: 300,
+            size: 150,
           },
           {
             accessorKey: 'status',
             enableClickToCopy: true,
             filterVariant: 'autocomplete',
             header: 'Status',
-            size: 300,
+            size: 150,
+            Cell: ({ cell }) => statusMap[cell.getValue()],
           },
           {
             accessorFn: (row) => new Date(row.dateOfInput),
@@ -43,6 +53,7 @@ const Dashboard = () => {
             filterVariant: 'date',
             filterFn: 'lessThan',
             sortingFn: 'datetime',
+            size: 150,
             Cell: ({ cell }) => cell.getValue()?.toLocaleDateString(),
             Header: ({ column }) => <em>{column.columnDef.header}</em>,
             muiFilterTextFieldProps: {
@@ -132,37 +143,37 @@ const Dashboard = () => {
     ),
     renderRowActionMenuItems: ({ closeMenu, row }) => [
       <MenuItem
-        key={0}
-        onClick={() => {
-          console.log('Row data:', row.original); // Log the entire row data
-          const incId = row.original?.incidentNo; // Check property name
-          console.log('Incident ID:', incId); // Log the incident ID
-          if (incId) {
-            router.push(`dashboard/incident/${incId}`);
-          } else {
-            console.error('Incident ID is undefined');
-          }
-          closeMenu();
-        }}
-        sx={{ m: 0 }}
-      >
+          key={1}
+          onClick={() => {
+            closeMenu();
+          }}
+          sx={{ m: 0 }}
+        >
         <ListItemIcon>
           <Dns/>
         </ListItemIcon>
         View
       </MenuItem>,
-      <MenuItem
-        key={1}
-        onClick={() => {
-          closeMenu();
-        }}
-        sx={{ m: 0 }}
-      >
-        <ListItemIcon>
-          <Edit />
-        </ListItemIcon>
-        Edit
-      </MenuItem>,
+            <MenuItem
+              key={0}
+              onClick={() => {
+                console.log('Row data:', row.original); // Log the entire row data
+                const incId = row.original?.incidentNo; // Check property name
+                console.log('Incident ID:', incId); // Log the incident ID
+                if (incId) {
+                  router.push(`dashboard/incident/${incId}`);
+                } else {
+                  console.error('Incident ID is undefined');
+                }
+                closeMenu();
+              }}
+              sx={{ m: 0 }}
+            >
+              <ListItemIcon>
+                <Edit />
+              </ListItemIcon>
+              Edit
+            </MenuItem>,
     ],
 
     muiTableBodyProps: {
@@ -227,6 +238,7 @@ const Dashboard = () => {
 
 
   return (
+    <div>
     <Box 
       sx={{ 
         backgroundColor: '#f0f4f8', // Light background color
@@ -271,12 +283,14 @@ const Dashboard = () => {
         </Grid>
       </Grid>
 
-      <Card sx={{ mt: 2 }}>
+      <Card sx={{ mt: 2, mb: 4 }}>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <MaterialReactTable table={table} />
         </LocalizationProvider>
       </Card>
     </Box>
+      <Footer/>
+    </div>
   );
 };
 

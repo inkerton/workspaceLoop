@@ -12,6 +12,7 @@ import {
   OutlinedInput ,
   Chip,
   Grid,
+  Divider,
 } from '@mui/material';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 
@@ -187,11 +188,13 @@ function NewIncident() {
     <div>
       <Box component="form" onSubmit={handleSubmit} sx={{ p: 2, maxWidth: 1000, mx: 'auto' }}>
         <div className='items-center'>
-          <Typography variant="h4" gutterBottom sx={{ alignContent: 'center'}}>
+          <Typography variant="h4" gutterBottom color={'#12a1c0'} sx={{ alignContent: 'center', fontWeight: 'bold', mb: 2}}>
             Incident Form
           </Typography>
+          <Divider/>
         </div>
         <Grid container spacing={2}>
+                  {/* incident no. */}
             <Grid item xs={12}>
               <Box className="flex" sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
 
@@ -217,6 +220,7 @@ function NewIncident() {
               </Box>
             </Grid>
 
+                  {/* input source */}
             <Grid item xs={12}>
               <Box className="flex" sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
 
@@ -291,8 +295,7 @@ function NewIncident() {
               </Box>
             </Grid>
 
-            
-
+                  {/* date of input */}
             <Grid item xs={12}>
               <Box className="flex" sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
               <Grid item xs={3}>
@@ -312,6 +315,7 @@ function NewIncident() {
               </Box>
             </Grid>
 
+                  {/* Entity Impacted */}
             <Grid item xs={12}>
               <Box className="flex" sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
 
@@ -386,6 +390,7 @@ function NewIncident() {
               </Box>
             </Grid>
 
+                  {/* category */}
             <Grid item xs={12}>
               <Box className="flex" sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
 
@@ -413,6 +418,7 @@ function NewIncident() {
               </Box>
             </Grid>
 
+                  {/* brief */}
             <Grid item xs={12}>
               <Box className="flex" sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
 
@@ -438,6 +444,7 @@ function NewIncident() {
               </Box>
             </Grid>
 
+                  {/* assigned to */}
             <Grid item xs={12}>
               <Box className="flex" sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
 
@@ -513,55 +520,13 @@ function NewIncident() {
               </Box>
             </Grid>
 
-            {/* <Grid item xs={12}>
-            <Box className="flex" sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-              <Grid item xs={3}>
-                <Typography variant="h6">
-                  Assigned To:
-                </Typography>
-              </Grid>
-              <Grid item xs={9}>
-              <div>
-              <FormControl sx={{ m: 1, width: 300 }}>
-                <InputLabel id="demo-multiple-chip-label">Chip</InputLabel>
-                <Select
-                  labelId="demo-multiple-chip-label"
-                  id="demo-multiple-chip"
-                  multiple
-                  value={personName}
-                  onChange={handleChange}
-                  input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
-                  renderValue={(selected) => (
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                      {selected.map((value) => (
-                        <Chip key={value} label={value} />
-                      ))}
-                    </Box>
-                  )}
-                  MenuProps={MenuProps}
-                >
-                  {names.map((name) => (
-                    <MenuItem
-                      key={name}
-                      value={name}
-                      style={getStyles(name, personName, theme)}
-                    >
-                      {name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </div>
-              </Grid>
-            </Box>
-          </Grid> */}
-
+                  {/* comments */}
             <Grid item xs={12}>
               <Box className="flex" sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
 
               <Grid item xs={3}>
                 <Typography variant="h6" >
-                  Any Comments:
+                  Initial Comments:
                 </Typography>
                 </Grid>
                 <Grid item xs={9}>
@@ -582,9 +547,9 @@ function NewIncident() {
 
           </Grid>
           
-          <div className='items-end justify-between'>
-            <Button type="submit" variant="contained" color="primary" sx={{ mt: 2, mb: 10, backgroundColor: '#12a1c0', color: '#fff' }}>
-              Submit
+          <div className='flex justify-end'>
+            <Button type="submit" variant="contained" color="primary" sx={{ mt: 2, mb: 14, backgroundColor: '#12a1c0', color: '#fff' }}>
+              Submit New Incident
             </Button>
           </div>
 

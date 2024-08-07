@@ -1,7 +1,6 @@
 import dbConnect from '../../../utils/mongodb';
 import NewIncident from "../../../model/NewIncident";
 import { NextResponse } from 'next/server';
-import { NextRequest } from 'next/server';
 
 export async function  GET(request){
     // const { id } = request.query;
@@ -24,3 +23,4 @@ export async function  GET(request){
   }
 
  }
+

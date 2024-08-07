@@ -21,7 +21,7 @@ function Hero() {
 
             <div className="mt-8 flex flex-wrap justify-center gap-4">
                 <a
-                className="block w-full rounded border border-primary bg-primary px-12 py-3 text-sm font-medium text-white hover:bg-transparent hover:text-black focus:outline-none focus:ring active:text-opacity-75 sm:w-auto"
+                className="block w-full rounded border border-primary bg-primary px-12 py-3 text-sm font-medium text-white bg-black hover:bg-gray-200 hover:text-black focus:outline-none focus:ring active:text-opacity-75 sm:w-auto"
                 href="/signin"
                 >
                 Get Started

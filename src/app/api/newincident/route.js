@@ -54,3 +54,28 @@ export async function GET(request) {
     return NextResponse.json({message: "Error while getting incidents"}, {status: 500});
   }
 }
+
+export async function PUT(request) {
+  await dbConnect();
+  try {
+    const { incidentNo, assignedTo, status } = await request.json();
+
+    const incident = await NewIncident.findOne({ incidentNo });
+    console.log(incident)
+
+    if (!incident) {
+      return NextResponse.json({ message: "Incident not found" }, { status: 404 });
+    }
+
+    incident.assignedTo = assignedTo;
+    incident.status = status;
+
+    await incident.save();
+
+    // return NextResponse.json({ message: "Incident updated successfully", data: incident }, { status: 200 });
+    return NextResponse.json({ message: "Incident updated successfully" }, { status: 200 });
+  } catch (error) {
+    console.log(error);
+    return NextResponse.json({ message: "Error while updating incident" }, { status: 500 });
+  }
+}
