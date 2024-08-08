@@ -29,6 +29,7 @@ function page({ params }) {
     const [ artifacts, setArtifacts] = useState('');
     const [ miscellaneousInfo, setMiscellaneousInfo] = useState('');
     const [ pdfFiles, setPdfFiles] = useState([]);
+    const [ finalReport, setFinalReport] = useState(null);
 
     const [selectedLogOption, setSelectedLogOption] = useState('');
     const editorRef = useRef(null);
@@ -422,6 +423,10 @@ function page({ params }) {
 
     const handleFileChange = (event) => {
         setPdfFiles(Array.from(event.target.files));
+    };
+    
+    const handlesingleFileChange = (event) => {
+        setFinalReport(event.target.files);
     };
 
     console.log(JSON.stringify(TTPDetails))
@@ -986,6 +991,36 @@ function page({ params }) {
                                     </Box>
                                     </Grid>
 
+                                    {/* initial report */}
+                                    <Grid item xs={12}>
+                                    <Box className="flex" sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2}}>
+
+                                        <Grid item xs={3}>
+                                        <Typography variant="h6" >
+                                        Initial Reports:
+                                        </Typography>
+                                        </Grid>
+
+                                        <Grid item xs={9}>
+                                                <input
+                                                    type="file"
+                                                    accept=".pdf, .docx"
+                                                    multiple
+                                                    onChange={handleFileChange}
+                                                    style={{ 
+                                                        marginBottom: '1rem',
+                                                        
+                                                    }}
+                                                />
+                                                <List>
+                                                    {pdfFiles.map((file, index) => (
+                                                        <ListItem key={index}>{file.name}</ListItem>
+                                                    ))}
+                                                </List>
+                                        </Grid>
+                                    </Box>
+                                    </Grid>
+
                                     {/* final report */}
                                     <Grid item xs={12}>
                                     <Box className="flex" sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2}}>
@@ -999,18 +1034,18 @@ function page({ params }) {
                                         <Grid item xs={9}>
                                                 <input
                                                     type="file"
-                                                    accept=".pdf"
-                                                    multiple
-                                                    onChange={handleFileChange}
+                                                    accept=".pdf, .docx"
+                                                    onChange={handlesingleFileChange}
                                                     style={{ 
                                                         marginBottom: '1rem',
                                                         
                                                     }}
                                                 />
                                                 <List>
-                                                    {pdfFiles.map((file, index) => (
+                                                    {/* {pdfFiles.map((file, index) => (
                                                         <ListItem key={index}>{file.name}</ListItem>
-                                                    ))}
+                                                    ))} */}
+                                                    <ListItem>{finalReport}</ListItem>
                                                 </List>
                                         </Grid>
                                     </Box>

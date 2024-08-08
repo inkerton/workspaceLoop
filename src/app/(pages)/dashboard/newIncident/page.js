@@ -175,6 +175,13 @@ function NewIncident() {
       console.log('12121212121:',response.data);
       setIndex(index + 1);
       if(response.status == 200){
+        setInputSource(null);
+        setDateOfInput(null);
+        setEntityImpacted(null);
+        setCategory('');
+        setBrief('');
+        setAssignedTo([]);
+        setComment('');
         return alert("data stored successfully");
     }
     return alert("storage failed");

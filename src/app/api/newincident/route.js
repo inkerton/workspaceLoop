@@ -58,7 +58,7 @@ export async function GET(request) {
 export async function PUT(request) {
   await dbConnect();
   try {
-    const { incidentNo, assignedTo, status } = await request.json();
+    const { incidentNo, status } = await request.json();
 
     const incident = await NewIncident.findOne({ incidentNo });
     console.log(incident)
@@ -67,7 +67,7 @@ export async function PUT(request) {
       return NextResponse.json({ message: "Incident not found" }, { status: 404 });
     }
 
-    incident.assignedTo = assignedTo;
+    // incident.assignedTo = assignedTo;
     incident.status = status;
 
     await incident.save();
