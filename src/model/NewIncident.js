@@ -4,7 +4,7 @@ const newIncidentSchema = new mongoose.Schema({
     incidentNo: {
         type: String,
         required: true,
-        unique: true,
+        // unique: true,
     },
     inputSource: {
         type: String,

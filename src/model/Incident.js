@@ -1,28 +1,3 @@
-// import mongoose from 'mongoose';
-
-// const IncidentSchema = new mongoose.Schema({
-//     incidentNo: {
-//         type: String,
-//         required: true,
-//         unique: true,
-//         ref: 'NewIncident',  // Reference to the NewIncident collection
-//     },
-//     receivers: [{
-//         value: String,
-//         info: String,
-//     }],
-//     files: [{
-//         filename: String,
-//         originalname: String,
-//         path: String,
-//         mimetype: String,
-//         size: Number,
-//     }],
-// }, { timestamps: true });
-
-// const IncidentInfo = mongoose.models.IncidentInfo || mongoose.model("IncidentInfo", IncidentSchema);
-
-// export default IncidentInfo;
 
 // models/Incident.js
 import mongoose from 'mongoose';
@@ -31,43 +6,42 @@ import NewIncident from './NewIncident';
 const IncidentSchema = new mongoose.Schema({
     incidentNo: {
         type: String,
-        required: true,
-        unique: true,
-        ref: NewIncident,
+        required: false,
     },
     entryPointOfContactName: {
         type: String,
-        required: true,
+        required: false,
     },
     entryPointOfContactNumber: {
         type: String,
-        required: true,
+        required: false,
     },
     logCollectionDetails: {
         type: String,
-        required: true,
+        required: false,
     },
     artifacts: {
         type: String,
-        required: true,
+        required: false,
     },
     miscellaneousInfo: {
         type: String,
-        required: true,
+        required: false,
     },
     TTPDetails: {
         type: [{ value: String, info: String }],
-        required: true,
+        required: false,
     },
     pdfFiles: [
         {
             filename: String,
             fileId: mongoose.Schema.Types.ObjectId,
+            data: Buffer,
         },
     ],
 }, { timestamps: true });
 
-const IncidentInfo = mongoose.models.IncidentInfo || mongoose.model('Incident', IncidentSchema);
+const IncidentInfo = mongoose.models.IncidentInfo || mongoose.model('IncidentInfo', IncidentSchema);
 
 export default IncidentInfo;
 
