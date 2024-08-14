@@ -162,7 +162,7 @@ function ClosedIncidents({ data }) {
                     console.log('Incident ID:', incId); // Log the incident ID
                     // setIncidentNo(incId);
                     if (incId) {
-                      router.push(`dashboard/incident/${incId}`);
+                      router.push(`dashboard/incidentInfo/${incId}`);
                     } else {
                       console.error('Incident ID is undefined');
                     }
@@ -173,7 +173,7 @@ function ClosedIncidents({ data }) {
                   <ListItemIcon>
                     <Edit />
                   </ListItemIcon>
-                  Edit
+                  Add IncInfo
                 </MenuItem>,
 
 
