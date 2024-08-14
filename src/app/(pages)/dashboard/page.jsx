@@ -5,11 +5,13 @@ import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import Footer from '@/app/components/Footer';
 import OpenIncidents from '@/app/components/OpenIncidents';
+import ClosedIncidents from '@/app/components/ClosedIncidents';
 
 const Dashboard = () => {
   const router = useRouter();
 
   const [incidentsData, setIncidentsData] = useState([]);
+  const [totalIncidents, setTotalIncidents] = useState('');
 
   const getIncidents = async ()=>{
     try {
@@ -17,7 +19,10 @@ const Dashboard = () => {
       const response = await axios.get('/api/newincident');
       const data = response.data.data;
       console.log(data);
+      console.log('len',response.data);
       setIncidentsData(data);
+      setTotalIncidents(response.data.count);
+      console.log('object',totalIncidents)
       if(response.status == 200){
         return alert("incidents fetched successfully");
       }
@@ -34,8 +39,20 @@ const Dashboard = () => {
 
     // Filter the incidentsData where status is not 'CLOSED'
     const openIncidentsData = incidentsData.filter(
-      (incident) => incident.status !== 'CLOSED'
+      (incident) => incident.status !== 'CLOSED_INCIDENT'
     );
+
+    //Filter the incidentsDara where status is 'CLOSED'
+    const closedIncidentsData = incidentsData.filter(
+      (incident) => incident.status == 'CLOSED_INCIDENT'
+    )
+
+    const openIncidentsCount = openIncidentsData.length;
+    const closedIncidentsCount = closedIncidentsData.length;
+
+    // console.log('cid',closedIncidentsData);
+    // console.log('Number of Open Incidents:', openIncidentsCount);
+    // console.log('Number of Closed Incidents:', closedIncidentsCount);
 
   return (
     <div>
@@ -54,14 +71,18 @@ const Dashboard = () => {
         <Grid item xs={6}>
           <Card sx={{ boxShadow: 'sm' }} className='shadow-md'>
             <CardContent>
-              <Typography variant='h6'>
-                Total Incidents: XX
+              <Typography variant='h6' color={'black'} sx={{ fontWeight: 'bold'}} >
+                Total Incidents: <span style={{ color: '#12a1c0', fontWeight: 'bold' }}>{totalIncidents}</span>
               </Typography>
-              <Typography variant='h6'>
-                Incidents Closed: XX
+              <Typography 
+              variant='h6' 
+              color={'#12a1c0'} 
+              sx={{ fontWeight: 'bold'}}
+              >
+                Incidents Closed: <span style={{ color: 'black', fontWeight: 'bold' }}>{closedIncidentsCount}</span>
               </Typography>
-              <Typography variant='h6'>
-                Incidents Open: XX
+              <Typography variant='h6' color={'#12a1c0'} sx={{ fontWeight: 'bold'}} >
+                Incidents Open: <span style={{ color: 'black', fontWeight: 'bold' }}>{openIncidentsCount} </span>
               </Typography>
             </CardContent>
           </Card>
@@ -86,6 +107,11 @@ const Dashboard = () => {
         <div>
         {/* Pass the filtered data to OpenIncidents component */}
         <OpenIncidents data={openIncidentsData} />
+        </div>
+
+        <div>
+          {/* Pass the filtered data to ClosedIncidents component */}
+          <ClosedIncidents data={closedIncidentsData} />
         </div>
 
     </Box>
