@@ -21,7 +21,6 @@ function page({ params }) {
     console.log('incdata',incidentData);
 
     const [incidentNo, setIncidentNo] = useState('');
-    const [ status, setStatus] = useState('ASSIGNED');
     const [ TTPDetails, setTTPDetails] = useState([]);
     const [ entryPointOfContactName, setEntryPointOfContactName] = useState('')
     const [ entryPointOfContactNumber, setEntryPointOfContactNumber] = useState('')
@@ -34,9 +33,7 @@ function page({ params }) {
     const [selectedLogOption, setSelectedLogOption] = useState('');
     const editorRef = useRef(null);
 
-    const formattedDate = new Date(incidentData.dateOfInput).toLocaleString();
-    const [assignedToOptions, setAssignedToOptions] = useState([])
-    const [assignedTo, setAssignedTo] = useState([]);
+
 
     const handleLogOptionChange = (event) => {
         setSelectedLogOption(event.target.value);
@@ -360,52 +357,52 @@ function page({ params }) {
         },
     ];
 
-    const getUsers = async ()=>{
-        try {
-          const response = await axios.get('/api/auth');
-          const data = response.data.data;
-          console.log(data);
-          if(response.status == 200){
-            const userOptions = data.map(user => user.username);
-            console.log(userOptions);
-            setAssignedToOptions(userOptions);
-            alert("data fetched successfully");
-          } else {
-            alert("could not get document count");
-          }
+    // const getUsers = async ()=>{
+    //     try {
+    //       const response = await axios.get('/api/auth');
+    //       const data = response.data.data;
+    //       console.log(data);
+    //       if(response.status == 200){
+    //         const userOptions = data.map(user => user.username);
+    //         console.log(userOptions);
+    //         setAssignedToOptions(userOptions);
+    //         alert("data fetched successfully");
+    //       } else {
+    //         alert("could not get document count");
+    //       }
     
-        } catch(error) {
-          console.log(error);
-        }
-      };
+    //     } catch(error) {
+    //       console.log(error);
+    //     }
+    //   };
 
-    const getIncidentInfo = async (incidentNo) => {
-        try {
-            const response = await axios.get(`/api/incidents/?incidentNo=${encodeURIComponent(incidentNo)}`);
-            const data = response.data.data;
-            console.log('incidents data', data);
+    // const getIncidentInfo = async (incidentNo) => {
+    //     try {
+    //         const response = await axios.get(`/api/incidents/?incidentNo=${encodeURIComponent(incidentNo)}`);
+    //         const data = response.data.data;
+    //         console.log('incidents data', data);
 
-            setIncidentData(data);
-            setAssignedTo(data.assignedTo);
-            setIncidentNo(data.incidentNo);
+    //         setIncidentData(data);
+    //         setAssignedTo(data.assignedTo);
+    //         setIncidentNo(data.incidentNo);
             
-            if (response.status == 200) {
-                // return alert('fetched successfully');
-                console.log('success');
-            } else {
-                console.log('something went wrong')
-            }
-        }  catch(error) {
-            console.log(error);
-        }
-    };
+    //         if (response.status == 200) {
+    //             // return alert('fetched successfully');
+    //             console.log('success');
+    //         } else {
+    //             console.log('something went wrong')
+    //         }
+    //     }  catch(error) {
+    //         console.log(error);
+    //     }
+    // };
 
-    useEffect(() => {
-        if (currentID) {
-            getIncidentInfo(currentID);
-            getUsers();
-        }
-    }, [currentID]);
+    // useEffect(() => {
+    //     if (currentID) {
+    //         getIncidentInfo(currentID);
+    //         getUsers();
+    //     }
+    // }, [currentID]);
 
     // const handleTTPDetailsChange = (event, value) => {
     //     const selectedTTPs = value.map(val => chipOptions.find(option => option.value === val) || { value: val, info: 'No info available' });
@@ -466,26 +463,7 @@ function page({ params }) {
         }))
     );
 
-    const handleSelectionChange = (event, value) => {
-        setAssignedTo(value); 
-    };
-
-    const handleUpdate = async () => {
-        try {
-            const response = await axios.put('/api/newincident', {
-                incidentNo,
-                assignedTo,
-                status});
-            if (response.status === 200) {
-                alert('Incident updated successfully');
-            } else {
-                alert('Failed to update incident');
-            }
-        } catch (error) {
-            console.log(error);
-            alert('An error occurred while updating the incident');
-        }
-    };
+    
 
     console.log('loggy',logCollectionDetails)
 
@@ -504,250 +482,13 @@ function page({ params }) {
                         </Typography>
                         <Divider/>
 
-                        <Card sx={{ backgroundColor: '#E6F9FD', mt: 2 ,mb: 2, boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)" }}>
-                            <CardContent >
-                            <Grid container spacing={2}>
-                                        {/* status */}
-                                    <Grid item xs={12}>
-                                        <Box className="flex" sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-
-                                        <Grid item xs={3}>
-                                        <Typography variant="h6" >
-                                        Status:
-                                        </Typography>
-                                        </Grid>
-
-                                        <Grid item xs={9}>
-                                        <TextField
-                                        select
-                                        label="status"
-                                        defaultValue="Assigned"
-                                        value={status}
-                                        onChange={(e) => setStatus(e.target.value)}
-                                        margin="normal"
-                                        fullWidth
-                                        sx={{ flexGrow: 1, backgroundColor: 'white'}}
-                                        >
-                                        <MenuItem value="ASSIGNED">Assigned</MenuItem>
-                                        <MenuItem value="UNASSIGNED">Unassigned</MenuItem>
-                                        <MenuItem value="INFORMATION_AWAITED">Information Awaited</MenuItem>
-                                        <MenuItem value="PROCESSING">Processing</MenuItem>
-                                        <MenuItem value="TEAM_SENT">Team Sent</MenuItem>
-                                        <MenuItem value="REPORT_BEING_PREPARED">Report Being Prepared</MenuItem>
-                                        </TextField>
-                                        </Grid>
-                                        </Box>
-                                    </Grid>
-
-                                    <Grid item xs={12}>
-                                        <Box className="flex" sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                                        <Grid item xs={3}>
-                                        <Typography variant="h6" >
-                                        Assigned To:
-                                        </Typography>
-                                        </Grid>
-
-                                        <Grid item xs={9}>
-
-                                        <Autocomplete
-                                            multiple
-                                            fullWidth
-                                            options={assignedToOptions}
-                                            getOptionLabel={(option) => option}
-                                            value={assignedTo}
-                                            onChange={handleSelectionChange}
-                                            sx={{ flexGrow: 1, backgroundColor: 'white'}}
-                                            renderTags={(value, getTagProps) =>
-                                                value.map((option, index) => (
-                                                    <Chip variant="outlined" label={option} {...getTagProps({ index })} />
-                                                ))
-                                            }
-                                            renderInput={(params) => (
-                                                <TextField
-                                                    {...params}
-                                                    variant="outlined"
-                                                    label="Assigned To"
-                                                    placeholder="Select users"
-                                                    fullWidth
-                                                    sx={{ flexGrow: 1, backgroundColor: 'white' }}
-                                                />
-                                            )}
-                                        />
-                                        </Grid>
-
-                                        </Box>
-                                    </Grid>
-
-                            </Grid>
-                            <div className='flex justify-end'>
-                                <Button 
-                                variant="contained" 
-                                color="primary" 
-                                sx={{mr: 4, backgroundColor: '#12a1c0', color: '#fff' }}
-                                onClick={handleUpdate} 
-                                >
-                                Update
-                                </Button>
-                            </div>
-
-                            </CardContent>
-                        </Card>
+                        
 
                         <div>
                             <section>
                                 <div className='p-4'>
                                     <Grid container spacing={2}>
-                                    <Grid item xs={12}>
-                                        <Box className="flex" sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
 
-                                        <Grid item xs={3}>
-                                        <Typography variant="h6" >
-                                        Input Source:
-                                        <Tooltip title="Read only">
-                                            <InfoIcon fontSize="small" color="disabled" /> {/* sx={{ verticalAlign: 'super' }} to mamke it superscript */}
-                                        </Tooltip>
-                                        </Typography>
-                                        </Grid>
-                                        <Grid item xs={9}>
-
-                                        <TextField
-                                            fullWidth
-                                            id="outlined-read-only-input"
-                                            // defaultValue="Hello World"
-                                            value={incidentData.inputSource}
-                                            InputProps={{
-                                                readOnly: true,
-                                            }}
-                                            />
-                                        </Grid>
-
-                                        </Box>
-                                    </Grid>
-
-                                    <Grid item xs={12}>
-                                        <Box className="flex" sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                                        <Grid item xs={3}>
-                                            <Typography variant="h6">
-                                            Date of Input:
-                                            <Tooltip title="Read only">
-                                                <InfoIcon fontSize="small" color="disabled"/>
-                                            </Tooltip>
-                                            </Typography>
-                                        </Grid>
-                                        <Grid item xs={9}>
-                                            <TextField
-                                            fullWidth
-                                            id="outlined-read-only-input"
-                                            value={formattedDate}
-                                            InputProps={{
-                                                readOnly: true,
-                                            }}
-                                            />
-                                        </Grid>
-                                        </Box>
-                                    </Grid>
-
-                                    <Grid item xs={12}>
-                                        <Box className="flex" sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-
-                                        <Grid item xs={3}>
-                                        <Typography variant="h6" >
-                                        Entity Impacted:
-                                        <Tooltip title="Read only">
-                                            <InfoIcon fontSize="small" color="disabled" /> {/* sx={{ verticalAlign: 'super' }} to mamke it superscript */}
-                                        </Tooltip>
-                                        </Typography>
-                                        </Grid>
-                                        <Grid item xs={9}>
-
-                                        <TextField
-                                            fullWidth
-                                            id="outlined-read-only-input"
-                                            // defaultValue="Hello World"
-                                            value={incidentData.entityImpacted}
-                                            InputProps={{
-                                                readOnly: true,
-                                            }}
-                                            />
-                                        </Grid>
-
-                                        </Box>
-                                    </Grid>
-
-                                    <Grid item xs={12}>
-                                        <Box className="flex" sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-
-                                        <Grid item xs={3}>
-                                        <Typography variant="h6" >
-                                        Category:
-                                        <Tooltip title="Read only">
-                                            <InfoIcon fontSize="small" color="disabled" /> {/* sx={{ verticalAlign: 'super' }} to mamke it superscript */}
-                                        </Tooltip>
-                                        </Typography>
-                                        </Grid>
-                                        <Grid item xs={9}>
-
-                                        <TextField
-                                            fullWidth
-                                            id="outlined-read-only-input"
-                                            // defaultValue="Hello World"
-                                            value={incidentData.category}
-                                            InputProps={{
-                                                readOnly: true,
-                                            }}
-                                            />
-                                        </Grid>
-
-                                        </Box>
-                                    </Grid>
-
-                                    <Grid item xs={12}>
-                                        <Box className="flex" sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-
-                                        <Grid item xs={3}>
-                                        <Typography variant="h6" >
-                                        Incident Brief:
-                                        <Tooltip title="Read only">
-                                            <InfoIcon fontSize="small" color="disabled" /> {/* sx={{ verticalAlign: 'super' }} to mamke it superscript */}
-                                        </Tooltip>
-                                        </Typography>
-                                        </Grid>
-                                        <Grid item xs={9}>
-
-                                        <TextareaAutosize
-                                        style={{ width: '100%', border: '1px solid lightgray', borderRadius: '4px', padding: '8px', }}
-                                        value={incidentData.brief}
-                                        readOnly
-                                        />
-                                        </Grid>
-
-                                        </Box>
-                                    </Grid>
-
-                                    <Grid item xs={12}>
-                                        <Box className="flex" sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-
-                                        <Grid item xs={3}>
-                                        <Typography variant="h6" >
-                                        Initial Comment:
-                                        <Tooltip title="Read only">
-                                            <InfoIcon fontSize="small" color="disabled" /> {/* sx={{ verticalAlign: 'super' }} to mamke it superscript */}
-                                        </Tooltip>
-                                        </Typography>
-                                        </Grid>
-                                        <Grid item xs={9}>
-
-                                        <TextareaAutosize
-                                        style={{ width: '100%', border: '1px solid lightgray', borderRadius: '4px', padding: '8px', }}
-                                        value={incidentData.comment}
-                                        readOnly
-                                        />
-                                        </Grid>
-
-                                        </Box>
-                                    </Grid>
-
-                                    <Divider/>
 
                                     {/* ttp details */}
                                     <Grid item xs={12}>
@@ -991,7 +732,7 @@ function page({ params }) {
                                     </Box>
                                     </Grid>
 
-                                    {/* initial report */}
+                                    {/* initial reports */}
                                     <Grid item xs={12}>
                                     <Box className="flex" sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2}}>
 

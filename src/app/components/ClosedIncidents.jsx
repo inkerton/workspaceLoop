@@ -9,7 +9,7 @@ import axios from 'axios';
 
 
 
-function OpenIncidents({ data }) {
+function ClosedIncidents({ data }) {
     const router = useRouter();
     const [openModal, setOpenModal] = useState(false);
     const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
@@ -472,4 +472,4 @@ function OpenIncidents({ data }) {
   )
 }
 
-export default OpenIncidents
+export default ClosedIncidents
