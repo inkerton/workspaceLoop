@@ -12,6 +12,7 @@ import axios from 'axios';
 function OpenIncidents({ data }) {
     const router = useRouter();
     const [openModal, setOpenModal] = useState(false);
+    const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
     const [selectedIncident, setSelectedIncident] = useState(null);
     const [ status, setStatus] = useState('ASSIGNED');
     const [incidentNo, setIncidentNo] = useState('');
@@ -24,6 +25,7 @@ function OpenIncidents({ data }) {
         PROCESSING: 'Processing',
         TEAM_SENT: 'Team Sent',
         REPORT_BEING_PREPARED: 'Report Being Prepared',
+        CLOSED_INCIDENT: 'Closed Incident',
       };
     
       const columns = useMemo(
@@ -266,7 +268,25 @@ function OpenIncidents({ data }) {
         setSelectedIncident(null);
       };
 
+
       const handleUpdate = async () => {
+        if (status === 'CLOSED_INCIDENT') {
+            setOpenConfirmationModal(true);
+        } else {
+            await updateIncident();
+        }
+    };
+
+    const handleConfirmCloseIncident = async (confirm) => {
+        setOpenConfirmationModal(false);
+        if (confirm) {
+            await updateIncident();
+            setOpenModal(false);
+        }
+    };
+
+
+      const updateIncident = async () => {
         try {
             const response = await axios.put('/api/newincident', {
                 incidentNo,
@@ -348,6 +368,7 @@ function OpenIncidents({ data }) {
                                 <MenuItem value="PROCESSING">Processing</MenuItem>
                                 <MenuItem value="TEAM_SENT">Team Sent</MenuItem>
                                 <MenuItem value="REPORT_BEING_PREPARED">Report Being Prepared</MenuItem>
+                                <MenuItem value="CLOSED_INCIDENT">Close Incident</MenuItem>
                                 </TextField>
                             </Grid>
                         </Box>
@@ -387,6 +408,66 @@ function OpenIncidents({ data }) {
                     </div>
             </Box>
         </Modal>
+
+        {/* Confirmation Modal */}
+        <Modal
+            open={openConfirmationModal}
+            onClose={() => setOpenConfirmationModal(false)}
+            aria-labelledby="confirmation-dialog"
+            aria-describedby="confirmation-dialog-description"
+          >
+                <Box 
+                sx={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  width: 600,
+                  bgcolor: 'background.paper',
+                  // border: '2px solid #000',
+                  // boxShadow: 24,
+                  borderRadius: '8px', // Rounded corners
+                  boxShadow: 'none', // No border
+                  p: 4,
+              }}
+                >
+                    <Typography variant="h6" id="confirmation-dialog-description">
+                        Are you sure you want to close this incident?
+                    </Typography>
+                    <div className='flex justify-end mt-2'>
+                        <Button
+                            variant="contained" 
+                            color="primary" 
+                            sx={{
+                                mr: 4, 
+                                backgroundColor: '#12a1c0', 
+                                color: '#fff',
+                                '&:hover': {
+                                backgroundColor: '#0F839D',
+                                }, 
+                            }}
+                            onClick={() => handleConfirmCloseIncident(false)}
+                        >
+                            No
+                        </Button>
+                        <Button
+                            variant="contained" 
+                            color="primary" 
+                            sx={{
+                                mr: 4, 
+                                backgroundColor: '#12a1c0', 
+                                color: '#fff',
+                                '&:hover': {
+                                backgroundColor: '#0F839D',
+                                }, 
+                            }}
+                            onClick={() => handleConfirmCloseIncident(true)}
+                        >
+                            Yes
+                        </Button>
+                    </div>
+                </Box>
+          </Modal>
     </div>
   )
 }
