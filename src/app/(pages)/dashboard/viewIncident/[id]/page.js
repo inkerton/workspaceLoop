@@ -1,11 +1,11 @@
 'use client'
 import React, {useState, useEffect} from 'react';
-import { Box, Button, Card, CardContent, CardHeader, Divider, Typography, Grid, TextField, MenuItem, FormControl, FormControlLabel, Radio, ListSubheader, RadioGroup, Tooltip, Autocomplete, Chip, List, ListItem } from '@mui/material';
+import { Box, Button, Card, CardContent, CardHeader, Divider, Typography, Grid, TextField, MenuItem, FormControl, FormControlLabel, Radio, ListSubheader, RadioGroup, Tooltip, Autocomplete, Chip, List, ListItem, IconButton } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
 import { TextareaAutosize } from '@mui/base/TextareaAutosize';
 import { Editor } from '@toast-ui/react-editor';
 import '@toast-ui/editor/dist/toastui-editor.css';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import axios from 'axios';
 
@@ -14,6 +14,7 @@ import axios from 'axios';
 function ViewIncident({ params }) {
     const currentID = params.id;
     console.log(currentID);
+    const router = useRouter();
     const [incidentData, setIncidentData] = useState([]);
     const [assignedTo, setAssignedTo] = useState([]);
     const [incidentNo, setIncidentNo] = useState('');
@@ -30,7 +31,7 @@ function ViewIncident({ params }) {
         CLOSED_INCIDENT: "Closed Incident",
       };
 
-    const getUsers = async ()=>{
+      const getUsers = async ()=>{
         try {
           const response = await axios.get('/api/auth');
           const data = response.data.data;
@@ -82,14 +83,20 @@ function ViewIncident({ params }) {
         <div className='p-4'>
             <Card>
                     <CardContent>
-                        <Typography 
-                        variant='h4' 
-                        color={'#12a1c0'} 
-                        className='p=2'
-                        sx={{ fontWeight: 'bold', mb: 2 }}
-                        >
-                            {incidentNo}
-                        </Typography>
+                        <div className='flex justify-between'>
+                            <Typography 
+                            variant='h4' 
+                            color={'#12a1c0'} 
+                            className='p-2'
+                            sx={{ fontWeight: 'bold', mb: 2 }}
+                            >
+                                {incidentNo}
+                            </Typography>
+                            
+                            <IconButton aria-label="back" size='large' onClick={() => router.push('/dashboard')} sx={{ mr: 4, mb: 2 }} >
+                                <ArrowBackIcon fontSize="inherit" />
+                            </IconButton>
+                        </div>
                         <Divider/>
 
                         <Card sx={{ backgroundColor: '#E6F9FD', mt: 2 ,mb: 2, boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)" }}>
@@ -154,6 +161,7 @@ function ViewIncident({ params }) {
                                             )}
                                         />
                                         </Grid>
+                                        
 
                                         </Box>
                                     </Grid>
