@@ -14,7 +14,7 @@ function ClosedIncidents({ data }) {
     const [openModal, setOpenModal] = useState(false);
     const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
     const [selectedIncident, setSelectedIncident] = useState(null);
-    const [ status, setStatus] = useState('ASSIGNED');
+    const [status, setStatus] = useState("FINAL_REPORT_SUBMITTED");
     const [incidentNo, setIncidentNo] = useState('');
 
 
@@ -25,6 +25,7 @@ function ClosedIncidents({ data }) {
         PROCESSING: 'Processing',
         TEAM_SENT: 'Team Sent',
         REPORT_BEING_PREPARED: 'Report Being Prepared',
+        FINAL_REPORT_SUBMITTED: 'Final Report Submitted',
         CLOSED_INCIDENT: 'Closed Incident',
       };
     
@@ -54,6 +55,25 @@ function ClosedIncidents({ data }) {
                 sortingFn: 'datetime',
                 size: 150,
                 Cell: ({ cell }) => cell.getValue()?.toLocaleDateString(),
+                Header: ({ column }) => <em>{column.columnDef.header}</em>,
+                muiFilterTextFieldProps: {
+                  sx: {
+                    minWidth: '250px',
+                  },
+                },
+              },
+              {
+                accessorFn: (row) => new Date(row.incidentClosedOn),
+                id: 'incidentClosedOn',
+                header: 'Closed On',
+                filterVariant: 'date',
+                filterFn: 'lessThan',
+                sortingFn: 'datetime',
+                size: 150,
+                Cell: ({ cell }) => {
+                  const dateValue = cell.getValue();
+                  return dateValue ? dateValue.toLocaleDateString() : 'Unknown';
+                },
                 Header: ({ column }) => <em>{column.columnDef.header}</em>,
                 muiFilterTextFieldProps: {
                   sx: {
@@ -235,11 +255,7 @@ function ClosedIncidents({ data }) {
 
       const handleOpenModal = (incident) => {
         setOpenModal(true);
-
-        setStatus(incident.status);
         setIncidentNo(incident.incidentNo);
-
-
       };
     
       const handleCloseModal = () => {
@@ -249,7 +265,7 @@ function ClosedIncidents({ data }) {
 
 
       const handleUpdate = async () => {
-        if (status === 'CLOSED_INCIDENT') {
+        if (status != 'CLOSED_INCIDENT') {
             setOpenConfirmationModal(true);
         } else {
             await updateIncident();
@@ -334,7 +350,6 @@ function ClosedIncidents({ data }) {
                                 <TextField
                                 select
                                 label="status"
-                                defaultValue="Assigned"
                                 value={status}
                                 onChange={(e) => setStatus(e.target.value)}
                                 margin="normal"
@@ -347,7 +362,7 @@ function ClosedIncidents({ data }) {
                                 <MenuItem value="PROCESSING">Processing</MenuItem>
                                 <MenuItem value="TEAM_SENT">Team Sent</MenuItem>
                                 <MenuItem value="REPORT_BEING_PREPARED">Report Being Prepared</MenuItem>
-                                <MenuItem value="CLOSED_INCIDENT">Close Incident</MenuItem>
+                                <MenuItem value="FINAL_REPORT_SUBMITTED">Final Report Submitted</MenuItem>
                                 </TextField>
                             </Grid>
                         </Box>
@@ -411,7 +426,7 @@ function ClosedIncidents({ data }) {
               }}
                 >
                     <Typography variant="h6" id="confirmation-dialog-description">
-                        Are you sure you want to close this incident?
+                        Are you sure you want to reopen this incident?
                     </Typography>
                     <div className='flex justify-end mt-2'>
                         <Button

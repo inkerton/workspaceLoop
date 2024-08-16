@@ -14,6 +14,10 @@ const newIncidentSchema = new mongoose.Schema({
         type: Date,
         required: false,
     },    
+    incidentClosedOn: {
+        type: Date,
+        required: false,
+    },    
     entityImpacted: {
         type: String,
         required: false,

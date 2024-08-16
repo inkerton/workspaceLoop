@@ -58,7 +58,7 @@ export async function GET(request) {
 export async function PUT(request) {
   await dbConnect();
   try {
-    const { incidentNo, status } = await request.json();
+    const { incidentNo, status, incidentClosedOn } = await request.json();
 
     const incident = await NewIncident.findOne({ incidentNo });
     console.log(incident)
@@ -69,6 +69,7 @@ export async function PUT(request) {
 
     // incident.assignedTo = assignedTo;
     incident.status = status;
+    incident.incidentClosedOn = incidentClosedOn;
 
     await incident.save();
 

@@ -1,14 +1,43 @@
 import dbConnect from '../../../utils/mongodb';
 import NewIncident from "../../../model/NewIncident";
 import { NextResponse } from 'next/server';
+import IncidentInfo from '@/model/Incident';
 
 export async function PUT(request) {
   await dbConnect();
   try {
-    const { incidentNo, comment, assignedTo, inputSource, dateOfInput, entityImpacted, category, brief } = await request.json();
+    console.log(request)
+    if (!request.body) {
+      console.log(request.body);
+      return NextResponse.json({ message: "No data provided" }, { status: 400 });
+    }
+
+    const body = await request.json();
+
+    // Destructure properties from the parsed JSON
+    const {
+      incidentNo,
+      comment,
+      assignedTo,
+      inputSource,
+      dateOfInput,
+      entityImpacted,
+      category,
+      brief,
+      entryPointOfContactName,
+      entryPointOfContactNumber,
+      miscellaneousInfo,
+      artifacts,
+      TTPDetails
+    } = body;
+    console.log('ass',assignedTo)
 
     const incident = await NewIncident.findOne({ incidentNo });
-    console.log(incident)
+    console.log('Incident:', incident);
+
+
+    const info = await IncidentInfo.findOne({ incidentNo });
+    console.log('Info:', info);
 
     if (!incident) {
       return NextResponse.json({ message: "Incident not found" }, { status: 404 });
@@ -23,6 +52,18 @@ export async function PUT(request) {
     incident.brief = brief;
 
     await incident.save();
+
+    if (info) {
+      if (entryPointOfContactName || entryPointOfContactNumber || miscellaneousInfo || artifacts || TTPDetails) {
+        if (entryPointOfContactName) info.entryPointOfContactName = entryPointOfContactName;
+        if (entryPointOfContactNumber) info.entryPointOfContactNumber = entryPointOfContactNumber;
+        if (miscellaneousInfo) info.miscellaneousInfo = miscellaneousInfo;
+        if (artifacts) info.artifacts = artifacts;
+        if (TTPDetails) info.TTPDetails = TTPDetails;
+
+        await info.save();
+      }
+    }
 
     // return NextResponse.json({ message: "Incident updated successfully", data: incident }, { status: 200 });
     return NextResponse.json({ message: "Incident updated successfully" }, { status: 200 });

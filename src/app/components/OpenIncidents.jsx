@@ -16,6 +16,7 @@ function OpenIncidents({ data }) {
     const [ status, setStatus] = useState('ASSIGNED');
     const [incidentNo, setIncidentNo] = useState('');
     const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
+    const [incidentClosedOn, setIncidentClosedOn] = useState('');
 
 
 
@@ -295,6 +296,7 @@ function OpenIncidents({ data }) {
 
       const handleUpdate = async () => {
         if (status === 'CLOSED_INCIDENT') {
+            setIncidentClosedOn(new Date().toISOString().split('T')[0]);
             setOpenConfirmationModal(true);
         } else {
             await updateIncident();
@@ -313,7 +315,8 @@ function OpenIncidents({ data }) {
       try {
           const response = await axios.put('/api/newincident', {
               incidentNo,
-              status});
+              status,
+              incidentClosedOn});
           if (response.status === 200) {
               setOpenModal(false);
               window.location.reload();
@@ -391,6 +394,7 @@ function OpenIncidents({ data }) {
                                 <MenuItem value="PROCESSING">Processing</MenuItem>
                                 <MenuItem value="TEAM_SENT">Team Sent</MenuItem>
                                 <MenuItem value="REPORT_BEING_PREPARED">Report Being Prepared</MenuItem>
+                                <MenuItem value="CLOSED_INCIDENT">Close Incident</MenuItem>
                                 </TextField>
                             </Grid>
                         </Box>
@@ -455,7 +459,10 @@ function OpenIncidents({ data }) {
                 >
                     <Typography variant="h6" id="confirmation-dialog-description">
                         Are you sure you want to close this incident?
+                        <br></br>
+                        Incident closed on: <span style={{ color: '#12a1c0', fontWeight: 'bold' }}>{incidentClosedOn}</span>
                     </Typography>
+                    
                     <div className='flex justify-end mt-2'>
                         <Button
                             variant="contained" 

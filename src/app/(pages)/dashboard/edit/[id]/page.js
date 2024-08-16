@@ -52,10 +52,15 @@ function page({ params }) {
     const [inputSource, setInputSource] = useState(null);
     const [brief, setBrief] = useState('');
     const [inputSourceOptions, setInputSourceOptions] = useState(allInputSourceOptions);
-
     const [ entityImpactedOpt, setEntityImpactedOpt ] = useState(entityImpactedOptions);
 
-
+    const [incidentInfo, setIncidentInfo] = useState(null);
+    const [entryPointOfContactName, setEntryPointOfContactName] = useState("");
+    const [entryPointOfContactNumber, setEntryPointOfContactNumber] = useState("");
+    const [logCollectionDetails, setLogCollectionDetails] = useState("");
+    const [artifacts, setArtifacts] = useState("");
+    const [miscellaneousInfo, setMiscellaneousInfo] = useState("");
+    const [TTPDetails, setTTPDetails] = useState([]);
 
 
 
@@ -91,14 +96,22 @@ function page({ params }) {
           setIncidentNo(data.incidentNo);
           setComment(data.comment);
           setInputSource(data.inputSource);
-          // const formattedDate = new Date(data.dateOfInput).toLocaleString();
-          console.log('date:',data.dateOfInput)
           const formattedDate = dayjs(data.dateOfInput).startOf('day');
-          console.log('date:',formattedDate)
           setDateOfInput(formattedDate.isValid() ? formattedDate : null);
           setEntityImpacted(data.entityImpacted);
           setCategory(data.category);
           setBrief(data.brief);
+
+          if (response.data.additionalInfo) {
+            const additionalInfo = response.data.additionalInfo;
+            console.log('additionalInfo', additionalInfo);
+            setIncidentInfo(response.data.additionalInfo || null);
+            setEntryPointOfContactName(additionalInfo.entryPointOfContactName);
+            setEntryPointOfContactNumber(additionalInfo.entryPointOfContactNumber);
+            setMiscellaneousInfo(additionalInfo.miscellaneousInfo);
+            setArtifacts(additionalInfo.artifacts);
+            setTTPDetails(additionalInfo.TTPDetails);
+        }
     
           if (response.status == 200) {
             // return alert('fetched successfully');
@@ -132,14 +145,39 @@ function page({ params }) {
         }
       };
 
+      const options = chipOptions.flatMap((group) =>
+        group.options.map((option) => ({
+          ...option,
+          group: group.group,
+        }))
+      );
+
+      const handleTTPDetailsChange = (event, value) => {
+        // Flatten chipOptions and find matching options
+        const allOptions = chipOptions.flatMap((group) => group.options);
+        const selectedTTPs = value.map(
+          (val) =>
+            allOptions.find((option) => option.value === val) || {
+              value: val,
+              info: "No info available",
+            }
+        );
+        setTTPDetails(selectedTTPs);
+      };
+
 
       const handleSelectionChange = (event, value) => {
         setAssignedTo(value);
       };
     
-      const handleUpdate = async () => {
+      const handleUpdate = async (e) => {
+        e.preventDefault();
         console.log(comment);
+        // console.log('entity name', entryPointOfContactName)
+        // console.log('entity name', miscellaneousInfo)
         try {
+          
+      
           const response = await axios.put("/api/editincident", {
             incidentNo,
             assignedTo,
@@ -149,7 +187,17 @@ function page({ params }) {
             entityImpacted,
             category,
             brief,
+            entryPointOfContactName,
+            entryPointOfContactNumber,
+            miscellaneousInfo,
+            artifacts,
+            TTPDetails,
+          }, {
+            headers: {
+              'Content-Type': 'application/json'
+            }
           });
+
           if (response.status === 200) {
             alert("Incident updated successfully");
           } else {
@@ -613,6 +661,266 @@ function page({ params }) {
 
               </Box>
             </Grid>
+
+            {incidentInfo !== null && (
+                                <>
+
+                                     {/* Grid item for TTP Details  */}
+                                     {incidentInfo.TTPDetails && incidentInfo.TTPDetails.length > 0 ? (
+                                        <Grid item xs={12}>
+                                        <Box
+                                          sx={{
+                                            display: "flex",
+                                            alignItems: "center",
+                                            gap: 2,
+                                            mb: 2,
+                                          }}
+                                        >
+                                          <Grid item xs={3}>
+                                            <Typography variant="h6">TTP Details:</Typography>
+                                          </Grid>
+                                          <Grid item xs={9}>
+                                            <Autocomplete
+                                              multiple
+                                              id="tags-filled"
+                                              options={options.map((option) => option.value)} // Use only the value for the options prop
+                                              value={TTPDetails.map((item) => item.value)} // Ensure value is an array of simple values
+                                              defaultValue={[]}
+                                              freeSolo
+                                              onChange={handleTTPDetailsChange}
+                                              renderTags={(value, getTagProps) =>
+                                                value.map((option, index) => {
+                                                  const chipOption = options.find(
+                                                    (o) => o.value === option
+                                                  );
+                                                  return (
+                                                    <Tooltip
+                                                      title={chipOption ? chipOption.info : ""}
+                                                      key={index}
+                                                    >
+                                                      <Chip
+                                                        variant="outlined"
+                                                        label={option}
+                                                        {...getTagProps({ index })}
+                                                      />
+                                                    </Tooltip>
+                                                  );
+                                                })
+                                              }
+                                              renderInput={(params) => (
+                                                <TextField
+                                                  {...params}
+                                                  label="TTP Details"
+                                                  placeholder="Add a receiver by pressing enter after its dotName or address"
+                                                />
+                                              )}
+                                              renderOption={(props, option) => {
+                                                const optionData = options.find(
+                                                  (o) => o.value === option
+                                                );
+                                                const previousGroup =
+                                                  options[
+                                                    options.findIndex((o) => o.value === option) -
+                                                      1
+                                                  ]?.group;
+                                                const currentGroup = optionData?.group;
+                  
+                                                return (
+                                                  <div {...props} key={option}>
+                                                    {currentGroup !== previousGroup && (
+                                                      <ListSubheader>
+                                                        {currentGroup}
+                                                      </ListSubheader>
+                                                    )}
+                                                    <MenuItem
+                                                      value={option}
+                                                      data-info={optionData?.info}
+                                                    >
+                                                      {option}
+                                                    </MenuItem>
+                                                  </div>
+                                                );
+                                              }}
+                                            />
+                                          </Grid>
+                                        </Box>
+                                      </Grid>
+                                    ) : null}
+
+                                    {/* Grid item for Artifacts  */}
+                                    {incidentInfo.artifacts && (
+                                      <Grid item xs={12}>
+                                        <Box
+                                          className="flex"
+                                          sx={{
+                                            display: "flex",
+                                            alignItems: "center",
+                                            gap: 2,
+                                            mb: 2,
+                                          }}
+                                        >
+                                          <Grid item xs={3}>
+                                            <Typography variant="h6">
+                                              Artifacts/IOC Collection Details:
+                                            </Typography>
+                                          </Grid>
+                  
+                                          <Grid item xs={9}>
+                                            <TextareaAutosize
+                                              placeholder="Artifacts/IOC Details"
+                                              minRows={2}
+                                              maxRows={2000}
+                                              style={{
+                                                width: "100%",
+                                                border: "1px solid black",
+                                                borderRadius: "4px",
+                                                padding: "8px",
+                                                boxSizing: "border-box",
+                                                transition: "border-color 0.3s",
+                                                outline: "none",
+                                              }}
+                                              onFocus={(e) =>
+                                                (e.target.style.borderColor = "#12a1c0")
+                                              }
+                                              onBlur={(e) =>
+                                                (e.target.style.borderColor = "black")
+                                              }
+                                              value={artifacts}
+                                              onChange={(e) => setArtifacts(e.target.value)}
+                                            />
+                                          </Grid>
+                                        </Box>
+                                      </Grid>
+                                    )}
+
+                                    {/* Grid item for Miscellaneous Info */}
+                                    {incidentInfo.miscellaneousInfo && (
+                                        <Grid item xs={12}>
+                                        <Box
+                                          className="flex"
+                                          sx={{
+                                            display: "flex",
+                                            alignItems: "center",
+                                            gap: 2,
+                                            mb: 2,
+                                          }}
+                                        >
+                                          <Grid item xs={3}>
+                                            <Typography variant="h6">
+                                              Miscellaneous Info.:
+                                            </Typography>
+                                          </Grid>
+                  
+                                          <Grid item xs={9}>
+                                            <TextareaAutosize
+                                              placeholder="Any Miscellaneous Info."
+                                              minRows={2}
+                                              maxRows={2000}
+                                              style={{
+                                                width: "100%",
+                                                border: "1px solid black",
+                                                borderRadius: "4px",
+                                                padding: "8px",
+                                                boxSizing: "border-box",
+                                                transition: "border-color 0.3s",
+                                                outline: "none",
+                                              }}
+                                              onFocus={(e) =>
+                                                (e.target.style.borderColor = "#12a1c0")
+                                              }
+                                              onBlur={(e) =>
+                                                (e.target.style.borderColor = "black")
+                                              }
+                                              value={miscellaneousInfo}
+                                              onChange={(e) =>
+                                                setMiscellaneousInfo(e.target.value)
+                                              }
+                                            />
+                                          </Grid>
+                                        </Box>
+                                      </Grid>
+                                    )}
+
+                                    {/* Grid item for entryPointOfContact  */}
+                                    {incidentInfo.entryPointOfContactName && (
+                                      <Grid item xs={12}>
+                                      <Box
+                                        className="flex"
+                                        sx={{
+                                          display: "flex",
+                                          alignItems: "center",
+                                          gap: 2,
+                                          mb: 2,
+                                        }}
+                                      >
+                                        <Grid item xs={3}>
+                                          <Typography variant="h6">
+                                            Entity Point of Contact:
+                                          </Typography>
+                                        </Grid>
+                
+                                        <Grid item xs={4}>
+                                          <TextareaAutosize
+                                            placeholder="Name"
+                                            minRows={1}
+                                            maxRows={2000}
+                                            style={{
+                                              width: "100%",
+                                              border: "1px solid black",
+                                              borderRadius: "4px",
+                                              padding: "8px",
+                                              boxSizing: "border-box",
+                                              transition: "border-color 0.3s",
+                                              outline: "none",
+                                            }}
+                                            onFocus={(e) =>
+                                              (e.target.style.borderColor = "#12a1c0")
+                                            }
+                                            onBlur={(e) =>
+                                              (e.target.style.borderColor = "black")
+                                            }
+                                            value={entryPointOfContactName}
+                                            onChange={(e) =>
+                                              setEntryPointOfContactName(e.target.value)
+                                            }
+                                          />
+                                        </Grid>
+                
+                                        <Grid item xs={4}>
+                                          <TextareaAutosize
+                                            placeholder="Number"
+                                            minRows={1}
+                                            maxRows={2000}
+                                            style={{
+                                              width: "100%",
+                                              border: "1px solid black",
+                                              borderRadius: "4px",
+                                              padding: "8px",
+                                              boxSizing: "border-box",
+                                              transition: "border-color 0.3s",
+                                              outline: "none",
+                                            }}
+                                            onFocus={(e) =>
+                                              (e.target.style.borderColor = "#12a1c0")
+                                            }
+                                            onBlur={(e) =>
+                                              (e.target.style.borderColor = "black")
+                                            }
+                                            value={entryPointOfContactNumber}
+                                            onChange={(e) =>
+                                              setEntryPointOfContactNumber(e.target.value)
+                                            }
+                                          />
+                                        </Grid>
+                                      </Box>
+                                    </Grid>
+                                    )}
+
+                                   
+
+
+                                </>
+                                )}
 
           </Grid>
           

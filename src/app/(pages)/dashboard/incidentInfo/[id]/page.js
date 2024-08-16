@@ -75,24 +75,6 @@ function page({ params }) {
 
 
 
-  const getUsers = async () => {
-    try {
-      const response = await axios.get("/api/auth");
-      const data = response.data.data;
-      console.log(data);
-      if (response.status == 200) {
-        const userOptions = data.map((user) => user.username);
-        console.log(userOptions);
-        setAssignedToOptions(userOptions);
-        alert("data fetched successfully");
-      } else {
-        alert("could not get document count");
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   const getIncidentInfo = async (incidentNo) => {
     try {
       const response = await axios.get(
@@ -119,7 +101,6 @@ function page({ params }) {
   // useEffect(() => {
   //   if (currentID) {
   //     getIncidentInfo(currentID);
-  //     getUsers();
   //   }
   // }, [currentID]);
 
