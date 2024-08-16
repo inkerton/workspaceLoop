@@ -15,6 +15,8 @@ function OpenIncidents({ data }) {
     const [selectedIncident, setSelectedIncident] = useState(null);
     const [ status, setStatus] = useState('ASSIGNED');
     const [incidentNo, setIncidentNo] = useState('');
+    const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
+
 
 
     const statusMap = {
@@ -24,6 +26,7 @@ function OpenIncidents({ data }) {
         PROCESSING: 'Processing',
         TEAM_SENT: 'Team Sent',
         REPORT_BEING_PREPARED: 'Report Being Prepared',
+        CLOSED_INCIDENT: 'Closed Incident',
       };
     
       const columns = useMemo(
@@ -190,6 +193,30 @@ function OpenIncidents({ data }) {
             </ListItemIcon>
             Change status
             </MenuItem>,
+
+
+            <MenuItem
+            key={1}
+            onClick={() => {
+              console.log('Row data:', row.original); // Log the entire row data
+              const incId = row.original?.incidentNo; // Check property name
+              console.log('Incident ID:', incId); // Log the incident ID
+              // setIncidentNo(incId);
+              if (incId) {
+                router.push(`dashboard/edit/${incId}`);
+              } else {
+                console.error('Incident ID is undefined');
+              }
+              closeMenu();
+            }}
+            sx={{ m: 0 }}
+            >
+            <ListItemIcon>
+              <Edit />
+            </ListItemIcon>
+            Edit
+            </MenuItem>,
+
         ],
     
         muiTableBodyProps: {
@@ -267,22 +294,38 @@ function OpenIncidents({ data }) {
       };
 
       const handleUpdate = async () => {
-        try {
-            const response = await axios.put('/api/newincident', {
-                incidentNo,
-                status});
-            if (response.status === 200) {
-                setOpenModal(false);
-                window.location.reload();
-                alert('Incident updated successfully');
-            } else {
-                alert('Failed to update incident');
-            }
-        } catch (error) {
-            console.log(error);
-            alert('An error occurred while updating the incident');
+        if (status === 'CLOSED_INCIDENT') {
+            setOpenConfirmationModal(true);
+        } else {
+            await updateIncident();
         }
     };
+
+    const handleConfirmCloseIncident = async (confirm) => {
+        setOpenConfirmationModal(false);
+        if (confirm) {
+            await updateIncident();
+            setOpenModal(false);
+        }
+    };
+
+    const updateIncident = async () => {
+      try {
+          const response = await axios.put('/api/newincident', {
+              incidentNo,
+              status});
+          if (response.status === 200) {
+              setOpenModal(false);
+              window.location.reload();
+              alert('Incident updated successfully');
+          } else {
+              alert('Failed to update incident');
+          }
+      } catch (error) {
+          console.log(error);
+          alert('An error occurred while updating the incident');
+      }
+  };
 
     return (
     <div>
@@ -387,6 +430,66 @@ function OpenIncidents({ data }) {
                     </div>
             </Box>
         </Modal>
+
+        {/* Confirmation Modal */}
+        <Modal
+            open={openConfirmationModal}
+            onClose={() => setOpenConfirmationModal(false)}
+            aria-labelledby="confirmation-dialog"
+            aria-describedby="confirmation-dialog-description"
+          >
+                <Box 
+                sx={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  width: 600,
+                  bgcolor: 'background.paper',
+                  // border: '2px solid #000',
+                  // boxShadow: 24,
+                  borderRadius: '8px', // Rounded corners
+                  boxShadow: 'none', // No border
+                  p: 4,
+              }}
+                >
+                    <Typography variant="h6" id="confirmation-dialog-description">
+                        Are you sure you want to close this incident?
+                    </Typography>
+                    <div className='flex justify-end mt-2'>
+                        <Button
+                            variant="contained" 
+                            color="primary" 
+                            sx={{
+                                mr: 4, 
+                                backgroundColor: '#12a1c0', 
+                                color: '#fff',
+                                '&:hover': {
+                                backgroundColor: '#0F839D',
+                                }, 
+                            }}
+                            onClick={() => handleConfirmCloseIncident(false)}
+                        >
+                            No
+                        </Button>
+                        <Button
+                            variant="contained" 
+                            color="primary" 
+                            sx={{
+                                mr: 4, 
+                                backgroundColor: '#12a1c0', 
+                                color: '#fff',
+                                '&:hover': {
+                                backgroundColor: '#0F839D',
+                                }, 
+                            }}
+                            onClick={() => handleConfirmCloseIncident(true)}
+                        >
+                            Yes
+                        </Button>
+                    </div>
+                </Box>
+          </Modal>
     </div>
   )
 }

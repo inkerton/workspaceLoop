@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import chipOptions from "@/app/components/chipOptions";
+import chipOptions from "@/app/components/Options/chipOptions";
 import axios from "axios";
 import {
   Box,

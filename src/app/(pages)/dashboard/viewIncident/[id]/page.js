@@ -8,6 +8,7 @@ import '@toast-ui/editor/dist/toastui-editor.css';
 import { useRouter } from 'next/navigation';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import axios from 'axios';
+import dayjs from 'dayjs';
 
 
 
@@ -20,7 +21,8 @@ function ViewIncident({ params }) {
     const [assignedTo, setAssignedTo] = useState([]);
     const [incidentNo, setIncidentNo] = useState('');
     const [assignedToOptions, setAssignedToOptions] = useState([]);
-    const formattedDate = new Date(incidentData.dateOfInput).toLocaleString();
+    // const formattedDate = new Date(incidentData.dateOfInput).toLocaleString();
+    const formattedDate = dayjs(incidentData.dateOfInput).format('DD-MMM-YYYY');
 
     const statusMapping = {
         ASSIGNED: "Assigned",

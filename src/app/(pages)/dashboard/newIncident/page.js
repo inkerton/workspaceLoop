@@ -23,6 +23,12 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import axios from 'axios';
 import { DatePicker } from '@mui/x-date-pickers';
 import { useTheme } from '@mui/material/styles';
+import { TextareaAutosize } from "@mui/base/TextareaAutosize";
+
+import entityImpactedOptions from '@/app/components/Options/EntityImpactedOptions';
+import allInputSourceOptions from '@/app/components/Options/InputSourceOptions';
+import dayjs from 'dayjs';
+
 
 const filter = createFilterOptions();
 
@@ -61,19 +67,11 @@ function NewIncident() {
   const [comment, setComment] = useState('');
   const [ status, setStatus] = useState('ASSIGNED');
   const [index, setIndex] = useState(0);
-  const [inputSourceOptions, setInputSourceOptions] = useState([
-    'mohan',
-    'ram',
-    'shyam',
-  ]);
+  const [inputSourceOptions, setInputSourceOptions] = useState(allInputSourceOptions);
 
   const [assignedToOptions, setAssignedToOptions] = useState([])
 
-  const [ entityImpactedOptions, setEntityImpactedOptions ] = useState([
-    'entity1',
-    'bsnl',
-    'rbi',
-  ])
+  const [ entityImpactedOpt, setEntityImpactedOpt ] = useState(entityImpactedOptions);
 
   const getUsers = async ()=>{
     try {
@@ -130,8 +128,8 @@ function NewIncident() {
   };
 
   const handleNewEntity = ( newName ) => {
-    if(!entityImpactedOptions.includes(newName)) {
-      setEntityImpactedOptions([...entityImpactedOptions, newName]);
+    if(!entityImpactedOpt.includes(newName)) {
+      setEntityImpactedOpt([...entityImpactedOpt, newName]);
     }
   };
 
@@ -314,8 +312,17 @@ function NewIncident() {
                 <Grid item xs={9}>
                   <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <DatePicker 
-                    value={dateOfInput}
-                    onChange={(newValue) => setDateOfInput(newValue)}
+                    value={dateOfInput ? dayjs(dateOfInput) : null} // Ensure the date is handled correctly
+                    onChange={(newValue) => {
+                      // Ensure newValue is valid before formatting
+                      if (newValue) {
+                        const formattedDate = dayjs(newValue).format('YYYY-MM-DD');
+                        setDateOfInput(formattedDate);
+                      } else {
+                        setDateOfInput(null); // Handle the case where newValue is null
+                      }
+                    }}
+                    format="DD/MM/YYYY" 
                     />
                   </LocalizationProvider>
                 </Grid>
@@ -336,7 +343,7 @@ function NewIncident() {
                 <Autocomplete
                   fullWidth
                   freeSolo
-                  options={entityImpactedOptions}
+                  options={entityImpactedOpt}
                   value={entityImpacted}
                   onInputChange={(event, newValue) => setEntityImpacted(newValue)}
                   onChange={(event, newValue) => {
@@ -435,17 +442,28 @@ function NewIncident() {
                 </Typography>
                 </Grid>
                 <Grid item xs={9}>
-
-                <TextField
-                  sx={{ flexGrow: 1}}
-                  label="Brief"
-                  value={brief}
-                  onChange={(e) => setBrief(e.target.value)}
-                  margin="normal"
-                  fullWidth
-                  multiline
-                  rows={4}
-                />
+                <TextareaAutosize
+                      placeholder="Brief"
+                      minRows={2}
+                      maxRows={2000}
+                      style={{
+                        width: "100%",
+                        border: "1px solid black",
+                        borderRadius: "4px",
+                        padding: "8px",
+                        boxSizing: "border-box",
+                        transition: "border-color 0.3s",
+                        outline: "none",
+                      }}
+                    onFocus={(e) =>
+                      (e.target.style.borderColor = "#12a1c0")
+                    }
+                    onBlur={(e) =>
+                      (e.target.style.borderColor = "black")
+                    }
+                    value={brief}
+                    onChange={(e) => setBrief(e.target.value)}
+                    />
                 </Grid>
 
               </Box>
@@ -537,17 +555,29 @@ function NewIncident() {
                 </Typography>
                 </Grid>
                 <Grid item xs={9}>
-
-                <TextField
-                  label="Comment"
+                <TextareaAutosize
+                  placeholder="Comment"
+                  minRows={2}
+                  maxRows={2000}
+                  style={{
+                    width: "100%",
+                    border: "1px solid black",
+                    borderRadius: "4px",
+                    padding: "8px",
+                    boxSizing: "border-box",
+                    transition: "border-color 0.3s",
+                    outline: "none",
+                  }}
+                  onFocus={(e) =>
+                    (e.target.style.borderColor = "#12a1c0")
+                  }
+                  onBlur={(e) =>
+                    (e.target.style.borderColor = "black")
+                  }
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
-                  margin="normal"
-                  fullWidth
-                  multiline
-                  rows={4}
-                  sx={{ flexGrow: 1}}
                   />
+
                   </Grid>
               </Box>
             </Grid>

@@ -11,9 +11,9 @@ export async function  GET(request){
     await dbConnect();
   try {
     const incident = await NewIncident.findOne({ incidentNo });
-    console.log(incident);
+    // console.log(incident);
     const incidentInfo = await IncidentInfo.findOne({ incidentNo });
-    console.log(incidentInfo);
+    // console.log(incidentInfo);
 
     if (!incident) {
       return NextResponse.json({message: "No incident present"}, {status: 500});  

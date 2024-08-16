@@ -106,7 +106,7 @@ function ClosedIncidents({ data }) {
         
         muiPaginationProps: {
           color: 'secondary',
-          rowsPerPageOptions: [10, 20, 30],
+          rowsPerPageOptions: [10, 20, 30, 50, 100],
           shape: 'rounded',
           variant: 'outlined',
         },
@@ -154,28 +154,7 @@ function ClosedIncidents({ data }) {
           </MenuItem>,
 
 
-                <MenuItem
-                  key={1}
-                  onClick={() => {
-                    console.log('Row data:', row.original); // Log the entire row data
-                    const incId = row.original?.incidentNo; // Check property name
-                    console.log('Incident ID:', incId); // Log the incident ID
-                    // setIncidentNo(incId);
-                    if (incId) {
-                      router.push(`dashboard/incidentInfo/${incId}`);
-                    } else {
-                      console.error('Incident ID is undefined');
-                    }
-                    closeMenu();
-                  }}
-                  sx={{ m: 0 }}
-                >
-                  <ListItemIcon>
-                    <Edit />
-                  </ListItemIcon>
-                  Add IncInfo
-                </MenuItem>,
-
+                
 
             <MenuItem
                 key={2}
