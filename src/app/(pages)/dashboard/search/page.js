@@ -1,4 +1,5 @@
 "use client";
+import SearchedIncidents from "@/app/components/SearchedIncidents";
 import {
   Box,
   Button,
@@ -13,9 +14,9 @@ import React, { useState } from "react";
 import { toast } from "react-toastify";
 
 function SearchPage() {
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
-  console.log("searchvalue:", searchResults);
+  console.log("searchvalue:", searchValue);
 
   const handleSearch = async () => {
     console.log("object inside search", searchValue);
@@ -72,7 +73,7 @@ function SearchPage() {
           className="w-full"
           sx={{
             mt: 2,
-            mb: 14,
+            mb: 2,
             backgroundColor: "#12a1c0",
             color: "#fff",
             "&:hover": {
@@ -95,6 +96,10 @@ function SearchPage() {
         ) : (
           <p>No results found</p>
         )}
+      </div>
+
+      <div>
+        <SearchedIncidents data={searchResults}/>
       </div>
     </div>
   );
