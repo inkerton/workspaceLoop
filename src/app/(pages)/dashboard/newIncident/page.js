@@ -28,6 +28,7 @@ import { TextareaAutosize } from "@mui/base/TextareaAutosize";
 import entityImpactedOptions from '@/app/components/Options/EntityImpactedOptions';
 import allInputSourceOptions from '@/app/components/Options/InputSourceOptions';
 import dayjs from 'dayjs';
+import { toast } from 'react-toastify';
 
 
 const filter = createFilterOptions();
@@ -63,7 +64,6 @@ function NewIncident() {
   const [brief, setBrief] = useState('');
   const [assignedTo, setAssignedTo] = useState([]);
   const [personName, setPersonName] = useState([]);
-  const [names, setNames] = useState([]);
   const [comment, setComment] = useState('');
   const [ status, setStatus] = useState('ASSIGNED');
   const [index, setIndex] = useState(0);
@@ -75,17 +75,13 @@ function NewIncident() {
 
   const getUsers = async ()=>{
     try {
-      const response = await axios.get('/api/auth');
+      const response = await axios.get('/api/register');
       const data = response.data.data;
-      console.log(data);
       if(response.status == 200){
-        const userOptions = data.map(user => user.username);
-        console.log(userOptions);
-        setAssignedToOptions(userOptions);
-        setNames(userOptions);
-        alert("data fetched successfully");
+        setAssignedToOptions(data);
+        toast.success("data fetched successfully");
       } else {
-        alert("could not get document count");
+        toast("could not get document count");
       }
 
     } catch(error) {
@@ -97,12 +93,11 @@ function NewIncident() {
     try {
       const response = await axios.get('/api/newincident');
       const data = response.data;
-      console.log(data);
       if(response.status == 200){
         setIndex(data.count+1);
-        alert("data fetched successfully");
+        toast("data fetched successfully");
       } else {
-        alert("could not get document count");
+        toast("could not get document count");
       }
 
     } catch(error) {

@@ -41,8 +41,7 @@ function SignUp() {
         console.log("user:", username, "pass:", password, "email: ", email);
         try{
             // Submit form data
-            const response = await axios.post('api/auth', {
-                action: 'register',
+            const response = await axios.post('api/register', {
                 username,
                 password,
                 email
@@ -52,7 +51,7 @@ function SignUp() {
                 }
             });  
     
-
+            
             console.log(response.data);
             if(response.status == 201){
                 router.push('/signin');

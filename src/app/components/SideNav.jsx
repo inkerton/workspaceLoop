@@ -18,7 +18,13 @@ function SideNav() {
       name:'New Incident',
       icon: ShieldPlus,
       path: '/dashboard/newIncident'
-    }
+    },
+    {
+      id:3,
+      name:'Search',
+      icon: ShieldPlus,
+      path: '/dashboard/search'
+    },
   ]
 
   const path = usePathname();
@@ -36,8 +42,8 @@ function SideNav() {
       />
 
       <div className='mt-5'>
-        {menuList.map((menu,index) =>(
-          <Link href={menu.path}>
+        {menuList.map(menu =>(
+          <Link href={menu.path} key={menu.id}>
           <h2 className={`flex gap-2 items-center text-gray-500 font-medium p-5 cursor-pointer rounded-md hover:text-primary hover:bg-blue-50
           ${path==menu.path && 'text-primary bg-blue-50'}
           `}>

@@ -1,7 +1,8 @@
 'use client'
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useRouter } from 'next/navigation'; // Import useRouter from next/navigation
+import { useRouter } from 'next/navigation'; 
+import { signIn} from 'next-auth/react';
 
 function SignIn() {
     const [username, setUsername] = useState("");
@@ -13,25 +14,36 @@ function SignIn() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         console.log("user:", username, "pass:", password);
-
-        try {
-          // Check if the user exists
-          const response = await axios.post('api/auth', {
-              action: 'login',
-              username,
-              password
-          }, {
-              headers: {
-                  'Content-Type': 'application/json'
-              }
-          });        
         
-        if (response.status === 200 && response.data.exists) {
-                  alert("Logged in successfully");
-                  router.push('/dashboard'); 
-          } else {
-              alert("User not found");
-          }
+        try {
+
+            const res = signIn("credentials", {
+                username: username,
+                password: password,
+                redirect: false
+            })
+
+            if(res.error) {
+                alert("Invalid credentials");
+                return;
+            }
+            router.replace("/dashboard");
+          // Check if the user exists
+        //   const response = await axios.post('api/auth', {
+        //       username,
+        //       password
+        //   }, {
+        //       headers: {
+        //           'Content-Type': 'application/json'
+        //       }
+        //   });        
+        
+        // if (response.status === 200 && response.data.exists) {
+        //           alert("Logged in successfully");
+        //           router.push('/dashboard'); 
+        //   } else {
+        //       alert("User not found");
+        //   }
       } catch (error) {
           console.error("An error occurred:", error);
           alert("User not found");

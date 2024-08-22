@@ -67,13 +67,10 @@ function page({ params }) {
 
     const getUsers = async () => {
         try {
-          const response = await axios.get("/api/auth");
+          const response = await axios.get("/api/register");
           const data = response.data.data;
-          console.log(data);
           if (response.status == 200) {
-            const userOptions = data.map((user) => user.username);
-            console.log(userOptions);
-            setAssignedToOptions(userOptions);
+            setAssignedToOptions(data);
             alert("data fetched successfully");
           } else {
             alert("could not get document count");
