@@ -81,7 +81,7 @@ function NewIncident() {
         setAssignedToOptions(data);
         toast.success("data fetched successfully");
       } else {
-        toast("could not get document count");
+        toast("could not get users");
       }
 
     } catch(error) {
@@ -91,13 +91,13 @@ function NewIncident() {
 
   const getIncidentsCount = async ()=>{
     try {
-      const response = await axios.get('/api/newincident');
+      const response = await axios.get('/api/count');
       const data = response.data;
+      console.log(data)
       if(response.status == 200){
         setIndex(data.count+1);
-        toast("data fetched successfully");
       } else {
-        toast("could not get document count");
+        toast.error("could not get document count");
       }
 
     } catch(error) {
@@ -175,12 +175,13 @@ function NewIncident() {
         setBrief('');
         setAssignedTo([]);
         setComment('');
-        return alert("data stored successfully");
+        return toast.success("data stored successfully");
     }
-    return alert("storage failed");
+    return toast.error("storage failed");
       // Optionally reset the form fields after successful submission
     } catch (error) {
       console.error('Error submitting form:', error);
+      toast.error('Error submitting form:', error);
     }
   };
 
@@ -219,6 +220,83 @@ function NewIncident() {
 
               </Box>
             </Grid>
+
+                  {/* assigned to */}
+                  <Grid item xs={12}>
+                  <Box className="flex" sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+
+                  <Grid item xs={3}>
+                    <Typography variant="h6" >
+                      Assigned To:
+                    </Typography>
+                    </Grid>
+                    <Grid item xs={9}>
+                    
+                    <Autocomplete
+                      fullWidth
+                      freeSolo
+                      multiple
+                      options={assignedToOptions}
+                      value={assignedTo}
+                      onInputChange={(event, newValue) => setAssignedTo(newValue)}
+                      onChange={(event, newValue) => {
+                        if (typeof newValue === 'string') {
+                          handleNewAssignedTo(newValue);
+                          setAssignedTo([...assignedTo, newValue]);
+                        } else if (newValue && newValue.inputValue) {
+                          handleNewAssignedTo(newValue.inputValue);
+                          setAssignedTo([...assignedTo, newValue.inputValue]);
+                        } else {
+                          setAssignedTo(newValue);
+                        }
+                      }}
+                      filterOptions={(options, params) => {
+                        const filtered = filter(options, params);
+                        const { inputValue } = params;
+                        const isExisting = options.some((option) => inputValue === option);
+                        if (inputValue !== '' && !isExisting) {
+                          filtered.push({
+                            inputValue,
+                            title: `Add "${inputValue}"`,
+                          });
+                        }
+                        return filtered;
+                      }}
+                      selectOnFocus
+                      clearOnBlur
+                      handleHomeEndKeys
+                      getOptionLabel={(option) => {
+                        if (typeof option === 'string') {
+                          return option;
+                        }
+                        if (option.inputValue) {
+                          return option.inputValue;
+                        }
+                        return option.title;
+                      }}
+                      renderOption={(props, option) => {
+                        const { key, ...optionProps } = props;
+                        return (
+                          <li key={key} {...optionProps}>
+                            {option.title || option}
+                          </li>
+                        );
+                      }}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label="Assigned To"
+                          margin="normal"
+                          fullWidth
+                          sx={{ flexGrow: 1 }}
+                        />
+                      )}
+                    />
+                    </Grid>
+
+                  </Box>
+                </Grid>
+
 
                   {/* input source */}
             <Grid item xs={12}>
@@ -459,82 +537,6 @@ function NewIncident() {
                     value={brief}
                     onChange={(e) => setBrief(e.target.value)}
                     />
-                </Grid>
-
-              </Box>
-            </Grid>
-
-                  {/* assigned to */}
-            <Grid item xs={12}>
-              <Box className="flex" sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-
-              <Grid item xs={3}>
-                <Typography variant="h6" >
-                  Assigned To:
-                </Typography>
-                </Grid>
-                <Grid item xs={9}>
-                
-                <Autocomplete
-                  fullWidth
-                  freeSolo
-                  multiple
-                  options={assignedToOptions}
-                  value={assignedTo}
-                  onInputChange={(event, newValue) => setAssignedTo(newValue)}
-                  onChange={(event, newValue) => {
-                    if (typeof newValue === 'string') {
-                      handleNewAssignedTo(newValue);
-                      setAssignedTo([...assignedTo, newValue]);
-                    } else if (newValue && newValue.inputValue) {
-                      handleNewAssignedTo(newValue.inputValue);
-                      setAssignedTo([...assignedTo, newValue.inputValue]);
-                    } else {
-                      setAssignedTo(newValue);
-                    }
-                  }}
-                  filterOptions={(options, params) => {
-                    const filtered = filter(options, params);
-                    const { inputValue } = params;
-                    const isExisting = options.some((option) => inputValue === option);
-                    if (inputValue !== '' && !isExisting) {
-                      filtered.push({
-                        inputValue,
-                        title: `Add "${inputValue}"`,
-                      });
-                    }
-                    return filtered;
-                  }}
-                  selectOnFocus
-                  clearOnBlur
-                  handleHomeEndKeys
-                  getOptionLabel={(option) => {
-                    if (typeof option === 'string') {
-                      return option;
-                    }
-                    if (option.inputValue) {
-                      return option.inputValue;
-                    }
-                    return option.title;
-                  }}
-                  renderOption={(props, option) => {
-                    const { key, ...optionProps } = props;
-                    return (
-                      <li key={key} {...optionProps}>
-                        {option.title || option}
-                      </li>
-                    );
-                  }}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label="Assigned To"
-                      margin="normal"
-                      fullWidth
-                      sx={{ flexGrow: 1 }}
-                    />
-                  )}
-                />
                 </Grid>
 
               </Box>

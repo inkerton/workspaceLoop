@@ -6,6 +6,7 @@ import { Modal, Box, Typography, Card, CardContent, Grid, Button, MenuItem, List
 import { AccountCircle, Dns, Edit, ProductionQuantityLimits, Send, TrackChangesOutlined } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 
 
@@ -92,6 +93,7 @@ function OpenIncidents({ data }) {
         enableRowActions: true,
         enableRowSelection: false,
         initialState: {
+          density: 'compact',
           showColumnFilters: false,
           showGlobalFilter: false,
           columnPinning: {
@@ -108,7 +110,7 @@ function OpenIncidents({ data }) {
         
         muiPaginationProps: {
           color: 'secondary',
-          rowsPerPageOptions: [10, 20, 30],
+          rowsPerPageOptions: [10, 20, 30, 50, 100, 200],
           shape: 'rounded',
           variant: 'outlined',
         },
@@ -232,11 +234,8 @@ function OpenIncidents({ data }) {
           muiTableBodyRowProps: ({ row }) => ({
             // Add row click handling 
             onClick: (event) => {
-              console.log(row.original.indicentNo);
-              const incId = row.original?.indicentNo;
-              if (incId) {
-                router.push(`/incident/${incId}`);
-              }
+              console.log('Row clicked:', row.original.incidentNo);
+              // router.push(`/dashboard/viewIncident/${row.original.incidentNo}`)
             },
             sx: {
               cursor: 'pointer',
@@ -245,39 +244,66 @@ function OpenIncidents({ data }) {
               }
             }
           }),
-      
+          muiTableHeadCellProps: ({ column }) => ({
+            sx: {
+              backgroundColor: column.id === 'mrt-row-actions' ? '#12a1c0' : '#12a1c0',
+              color: column.id === 'mrt-row-actions' ? 'black' : 'white',
+              fontWeight: 'bold',
+              border: '1px solid #ddd',
+              padding: '8px',
+            },
+          }),
           muiTableProps: {
             sx: {
-              // Custom table styles  
               borderCollapse: 'collapse',
               width: '100%',
               border: '1px solid #ddd',
               borderRadius: 4,
               boxShadow: '0px 2px 10px #ddd',
-      
-              // Header styling
-              '& .MuiTableCell-head': {
-                backgroundColor: '#12a1c0',
-                color: 'white',
-                fontWeight: 'bold',
-                border: '1px solid #ddd',
-                padding: '8px',
-              },
-      
-              // Cell styling
               '& .MuiTableCell-body': {
                 border: '1px solid #ddd',
               },
-      
-              // Hover effect for rows
               '& .MuiTableRow-root:hover': {
                 backgroundColor: '#eee',
               },
               '& .MuiTableRow-root:nth-of-type(odd)': {
                 backgroundColor: '#f9f9f9 !important',
               },
-            }
-          }
+            },
+          },
+      
+          // muiTableProps: {
+          //   sx: {
+          //     // Custom table styles  
+          //     borderCollapse: 'collapse',
+          //     width: '100%',
+          //     border: '1px solid #ddd',
+          //     borderRadius: 4,
+          //     boxShadow: '0px 2px 10px #ddd',
+      
+          //     // Header styling
+          //     '& .MuiTableCell-head': {
+          //       backgroundColor: '#12a1c0',
+          //       color: 'white',
+          //       fontWeight: 'bold',
+          //       border: '1px solid #ddd',
+          //       padding: '8px',
+          //     },
+      
+          //     // Cell styling
+          //     '& .MuiTableCell-body': {
+          //       border: '1px solid #ddd',
+          //     },
+      
+          //     // Hover effect for rows
+          //     '& .MuiTableRow-root:hover': {
+          //       backgroundColor: '#eee',
+          //     },
+          //     '& .MuiTableRow-root:nth-of-type(odd)': {
+          //       backgroundColor: '#f9f9f9 !important',
+          //     },
+          //   }
+          // }
       });
 
       const handleOpenModal = (incident) => {
@@ -299,19 +325,19 @@ function OpenIncidents({ data }) {
             setIncidentClosedOn(new Date().toISOString().split('T')[0]);
             setOpenConfirmationModal(true);
         } else {
-            await updateIncident();
+            await updateStatus();
         }
     };
 
     const handleConfirmCloseIncident = async (confirm) => {
         setOpenConfirmationModal(false);
         if (confirm) {
-            await updateIncident();
+            await updateStatus();
             setOpenModal(false);
         }
     };
 
-    const updateIncident = async () => {
+    const updateStatus = async () => {
       try {
           const response = await axios.put('/api/newincident', {
               incidentNo,
@@ -320,13 +346,13 @@ function OpenIncidents({ data }) {
           if (response.status === 200) {
               setOpenModal(false);
               window.location.reload();
-              alert('Incident updated successfully');
+              toast.success('Incident updated successfully');
           } else {
-              alert('Failed to update incident');
+              toast.error('Failed to update incident');
           }
       } catch (error) {
           console.log(error);
-          alert('An error occurred while updating the incident');
+          toast.error('An error occurred while updating the incident');
       }
   };
 

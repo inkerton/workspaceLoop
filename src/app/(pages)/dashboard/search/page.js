@@ -20,8 +20,8 @@ function SearchPage() {
 
   const handleSearch = async () => {
     console.log("object inside search", searchValue);
-    if (searchValue === "") {
-      alert("Search value cannot be empty!!!");
+    if (searchValue.length === 0) {
+      toast.error("Search value cannot be empty!!!");
     } else {
       await searchIncidents();
     }
@@ -29,7 +29,7 @@ function SearchPage() {
 
   const searchIncidents = async () => {
     try {
-      const response = await axios.post("/api/search", { searchValue });
+      const response = await axios.post("/api/searchinfo", { searchValue });
       const data = await response.data;
       setSearchResults(data);
 
@@ -41,7 +41,7 @@ function SearchPage() {
       }
     } catch (error) {
       console.error("Error searching value:", error);
-      toast("An error occurred while searching");
+      toast.error("An error occurred while searching");
     }
   };
 
@@ -62,7 +62,8 @@ function SearchPage() {
               ),
             }}
             value={searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
+            // onChange={(e) => setSearchValue(e.target.value)}
+            onChange={(e) => setSearchValue(e.target.value.split(",").map(keyword => keyword.trim()))}
           />
         </div>
 
@@ -86,7 +87,7 @@ function SearchPage() {
         </Button>
       </Box>
 
-      <div>
+      {/* <div>
         {searchResults.length > 0 ? (
           searchResults.map((item) => (
             <p key={item._id}>
@@ -96,7 +97,7 @@ function SearchPage() {
         ) : (
           <p>No results found</p>
         )}
-      </div>
+      </div> */}
 
       <div>
         <SearchedIncidents data={searchResults}/>

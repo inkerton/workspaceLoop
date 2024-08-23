@@ -1,7 +1,7 @@
 'use client'
 import React, { useEffect } from 'react'
 import Image from 'next/image'
-import { CircleUserRound, LayoutGrid, ShieldPlus } from 'lucide-react'
+import { CircleUserRound, LayoutGrid, Search, ShieldPlus } from 'lucide-react'
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 
@@ -22,7 +22,7 @@ function SideNav() {
     {
       id:3,
       name:'Search',
-      icon: ShieldPlus,
+      icon: Search,
       path: '/dashboard/search'
     },
   ]
@@ -34,7 +34,7 @@ function SideNav() {
   }, [path])
 
   return (
-    <div className='h-screen p-5 border shadow-sm'>
+    <div className='h-screen p-5 border shadow-sm '>
       <Image src={'/logo.svg'} 
       alt='logo'
       width={160}

@@ -110,6 +110,7 @@ function ClosedIncidents({ data }) {
         enableRowActions: true,
         enableRowSelection: false,
         initialState: {
+          density: 'compact',
           showColumnFilters: false,
           showGlobalFilter: false,
           columnPinning: {
@@ -205,11 +206,7 @@ function ClosedIncidents({ data }) {
           muiTableBodyRowProps: ({ row }) => ({
             // Add row click handling 
             onClick: (event) => {
-              console.log(row.original.indicentNo);
-              const incId = row.original?.indicentNo;
-              if (incId) {
-                router.push(`/incident/${incId}`);
-              }
+              console.log('Row clicked:', row.original.incidentNo);
             },
             sx: {
               cursor: 'pointer',
@@ -218,39 +215,66 @@ function ClosedIncidents({ data }) {
               }
             }
           }),
-      
+          muiTableHeadCellProps: ({ column }) => ({
+            sx: {
+              backgroundColor: column.id === 'mrt-row-actions' ? '#12a1c0' : '#12a1c0',
+              color: column.id === 'mrt-row-actions' ? 'black' : 'white',
+              fontWeight: 'bold',
+              border: '1px solid #ddd',
+              padding: '8px',
+            },
+          }),
           muiTableProps: {
             sx: {
-              // Custom table styles  
               borderCollapse: 'collapse',
               width: '100%',
               border: '1px solid #ddd',
               borderRadius: 4,
               boxShadow: '0px 2px 10px #ddd',
-      
-              // Header styling
-              '& .MuiTableCell-head': {
-                backgroundColor: '#12a1c0',
-                color: 'white',
-                fontWeight: 'bold',
-                border: '1px solid #ddd',
-                padding: '8px',
-              },
-      
-              // Cell styling
               '& .MuiTableCell-body': {
                 border: '1px solid #ddd',
               },
-      
-              // Hover effect for rows
               '& .MuiTableRow-root:hover': {
                 backgroundColor: '#eee',
               },
               '& .MuiTableRow-root:nth-of-type(odd)': {
                 backgroundColor: '#f9f9f9 !important',
               },
-            }
-          }
+            },
+          },
+      
+          // muiTableProps: {
+          //   sx: {
+          //     // Custom table styles  
+          //     borderCollapse: 'collapse',
+          //     width: '100%',
+          //     border: '1px solid #ddd',
+          //     borderRadius: 4,
+          //     boxShadow: '0px 2px 10px #ddd',
+      
+          //     // Header styling
+          //     '& .MuiTableCell-head': {
+          //       backgroundColor: '#12a1c0',
+          //       color: 'white',
+          //       fontWeight: 'bold',
+          //       border: '1px solid #ddd',
+          //       padding: '8px',
+          //     },
+      
+          //     // Cell styling
+          //     '& .MuiTableCell-body': {
+          //       border: '1px solid #ddd',
+          //     },
+      
+          //     // Hover effect for rows
+          //     '& .MuiTableRow-root:hover': {
+          //       backgroundColor: '#eee',
+          //     },
+          //     '& .MuiTableRow-root:nth-of-type(odd)': {
+          //       backgroundColor: '#f9f9f9 !important',
+          //     },
+          //   }
+          // }
       });
 
       const handleOpenModal = (incident) => {
@@ -268,20 +292,20 @@ function ClosedIncidents({ data }) {
         if (status != 'CLOSED_INCIDENT') {
             setOpenConfirmationModal(true);
         } else {
-            await updateIncident();
+            await updateStatus();
         }
     };
 
     const handleConfirmCloseIncident = async (confirm) => {
         setOpenConfirmationModal(false);
         if (confirm) {
-            await updateIncident();
+            await updateStatus();
             setOpenModal(false);
         }
     };
 
 
-      const updateIncident = async () => {
+      const updateStatus = async () => {
         try {
             const response = await axios.put('/api/newincident', {
                 incidentNo,

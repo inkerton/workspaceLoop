@@ -119,6 +119,8 @@ export async function POST(req) {
       const artifacts = formData.get("artifacts");
       const miscellaneousInfo = formData.get("miscellaneousInfo");
       console.log('Uploaded files:', req.files);
+      const logCollectionDetails = formData.get("logCollectionDetails");
+      console.log('log collection detals: ',logCollectionDetails);
 
   
       // Prepare PDF data for storage
@@ -132,6 +134,7 @@ export async function POST(req) {
         incidentNo,
         entryPointOfContactName,
         entryPointOfContactNumber,
+        logCollectionDetails,
         artifacts,
         miscellaneousInfo,
         TTPDetails: TTPDetails,
@@ -142,7 +145,7 @@ export async function POST(req) {
   
       return NextResponse.json(
         { message: "Incident created successfully" },
-        { status: 201 }
+        { status: 200 }
       );
     } catch (error) {
       console.error("Error creating incident:", error);

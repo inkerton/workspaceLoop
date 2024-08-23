@@ -31,6 +31,7 @@ import { DatePicker } from '@mui/x-date-pickers';
 import entityImpactedOptions from '@/app/components/Options/EntityImpactedOptions';
 import allInputSourceOptions from '@/app/components/Options/InputSourceOptions';
 import dayjs from 'dayjs';
+import { toast } from 'react-toastify';
 
 
 
@@ -71,9 +72,9 @@ function page({ params }) {
           const data = response.data.data;
           if (response.status == 200) {
             setAssignedToOptions(data);
-            alert("data fetched successfully");
+            toast.success("data fetched successfully");
           } else {
-            alert("could not get document count");
+            toast.error("could not get document count");
           }
         } catch (error) {
           console.log(error);
@@ -111,7 +112,7 @@ function page({ params }) {
         }
     
           if (response.status == 200) {
-            // return alert('fetched successfully');
+            return toast.success('fetched successfully');
             console.log("success");
           } else {
             console.log("something went wrong");
@@ -196,13 +197,13 @@ function page({ params }) {
           });
 
           if (response.status === 200) {
-            alert("Incident updated successfully");
+            toast.success("Incident updated successfully");
           } else {
-            alert("Failed to update incident");
+            toast.error("Failed to update incident");
           }
         } catch (error) {
           console.log(error);
-          alert("An error occurred while updating the incident");
+          toast.error("An error occurred while updating the incident");
         }
       };
 

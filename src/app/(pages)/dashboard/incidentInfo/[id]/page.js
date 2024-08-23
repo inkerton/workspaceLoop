@@ -31,6 +31,7 @@ import { TextareaAutosize } from "@mui/base/TextareaAutosize";
 import "@toast-ui/editor/dist/toastui-editor.css";
 
 import { Editor } from "@toast-ui/react-editor";
+import { toast } from "react-toastify";
 
 function page({ params }) {
   const router = useRouter();
@@ -56,8 +57,6 @@ function page({ params }) {
   const editorRef = React.createRef(null);
 
   const formattedDate = new Date(incidentData.dateOfInput).toLocaleString();
-  const [assignedToOptions, setAssignedToOptions] = useState([]);
-  const [assignedTo, setAssignedTo] = useState([]);
 
   // const [formData, setFormData] = useState( new FormData());
 
@@ -65,13 +64,15 @@ function page({ params }) {
     setSelectedLogOption(event.target.value);
   };
 
-  const handleEditorChange = () => {
-    if (editorRef.current) {
-      const editorInstance = editorRef.current.getInstance();
-      console.log("instNCE", editorInstance);
-      setLogCollectionDetails(editorInstance.getMarkdown());
-    }
-  };
+  // const handleEditorChange = () => {
+  //   if (editorRef.current) {
+  //     const editorInstance = editorRef.current.getInstance();
+  //     console.log("instNCE", editorInstance);
+  //     setLogCollectionDetails(editorInstance.getMarkdown().toLocaleString());
+  //     console.log('object from handle editor', logCollectionDetails);
+  //     console.log('object of type', typeof(logCollectionDetails));
+  //   }
+  // };
 
 
 
@@ -84,25 +85,25 @@ function page({ params }) {
       console.log("incidents data", data);
 
       setIncidentData(data);
-      setAssignedTo(data.assignedTo);
       setIncidentNo(data.incidentNo);
 
       if (response.status == 200) {
-        // return alert('fetched successfully');
-        console.log("success");
+        return toast.success('fetched successfully');
       } else {
         console.log("something went wrong");
+        toast.error("something went wrong");
       }
     } catch (error) {
       console.log(error);
+      toast.error(error);
     }
   };
 
-  // useEffect(() => {
-  //   if (currentID) {
-  //     getIncidentInfo(currentID);
-  //   }
-  // }, [currentID]);
+  useEffect(() => {
+    if (currentID) {
+      getIncidentInfo(currentID);
+    }
+  }, [currentID]);
 
 
   const handleTTPDetailsChange = (event, value) => {
@@ -131,10 +132,11 @@ function page({ params }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (editorRef.current) {
-      const editorInstance = editorRef.current.getInstance();
-      setLogCollectionDetails(editorInstance.getMarkdown().toString());
-    }
+    // if (editorRef.current) {
+    //   const editorInstance = editorRef.current.getInstance();
+    //   setLogCollectionDetails(editorInstance.getMarkdown().toString());
+    // }
+    console.log("brief", logCollectionDetails);
 
     const formData = new FormData();
     formData.append("incidentNo", incidentNo);
@@ -142,7 +144,8 @@ function page({ params }) {
     formData.append("entryPointOfContactName", entryPointOfContactName);
     console.log(formData);
     formData.append("entryPointOfContactNumber", entryPointOfContactNumber);
-    // formData.append("logCollectionDetails", logCollectionDetails);
+    formData.append("logCollectionDetails", logCollectionDetails);
+    console.log('object',logCollectionDetails);
     formData.append("artifacts", artifacts);
     formData.append("miscellaneousInfo", miscellaneousInfo);
     formData.append("TTPDetails", JSON.stringify(TTPDetails));
@@ -169,6 +172,12 @@ function page({ params }) {
         },
       });
       console.log("Response:", response.data);
+      if (response.status == 200) {
+        console.log("Incident info stored successfully");
+        toast.success("Incident info stored successfully")
+      } else {
+        toast.error("Could not Store info");
+      }
       // Handle success or redirect, if needed
     } catch (error) {
       console.log("Error uploading data:", error);
@@ -210,28 +219,6 @@ function page({ params }) {
       group: group.group,
     }))
   );
-
-  const handleSelectionChange = (event, value) => {
-    setAssignedTo(value);
-  };
-
-  const handleUpdate = async () => {
-    try {
-      const response = await axios.put("/api/newincident", {
-        incidentNo,
-        assignedTo,
-        status,
-      });
-      if (response.status === 200) {
-        alert("Incident updated successfully");
-      } else {
-        alert("Failed to update incident");
-      }
-    } catch (error) {
-      console.log(error);
-      alert("An error occurred while updating the incident");
-    }
-  };
 
   console.log("loggy", logCollectionDetails);
 
@@ -303,7 +290,7 @@ function page({ params }) {
                               <TextField
                                 {...params}
                                 label="TTP Details"
-                                placeholder="Add a receiver by pressing enter after its dotName or address"
+                                placeholder="Add TTP Details "
                               />
                             )}
                             renderOption={(props, option) => {
@@ -483,13 +470,13 @@ function page({ params }) {
                               initialEditType="wysiwyg"
                               useCommandShortcut={true}
                               ref={editorRef}
-                              // onChange={() => {
-                              //     if (editorRef.current) {
-                              //         const editorInstance = editorRef.current.getInstance();
-                              //         setLogCollectionDetails(editorInstance.getMarkdown());
-                              //     }
-                              // }}
-                              //   onChange={handleEditorChange}
+                              onChange={() => {
+                                  if (editorRef.current) {
+                                      const editorInstance = editorRef.current.getInstance();
+                                      setLogCollectionDetails(editorInstance.getMarkdown());
+                                  }
+                              }}
+                                // onChange={handleEditorChange}
                             />
                           )}
                         </Grid>

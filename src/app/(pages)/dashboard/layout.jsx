@@ -1,6 +1,7 @@
 import React from 'react'
 import SideNav from '../../components/SideNav';
 import DashboardHeader from '../../components/DashboardHeader';
+import ToastContainerWrapper from '@/app/components/ToastContainerWrapper';
 
 function DashboardLayout({children}) {
   return (
@@ -12,6 +13,7 @@ function DashboardLayout({children}) {
           <DashboardHeader />
         {children}
         </div>
+        <ToastContainerWrapper />
     </div>
   )
 }

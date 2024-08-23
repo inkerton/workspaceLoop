@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import Footer from '@/app/components/Footer';
 import OpenIncidents from '@/app/components/OpenIncidents';
 import ClosedIncidents from '@/app/components/ClosedIncidents';
+import { toast } from 'react-toastify';
 
 const Dashboard = () => {
   const router = useRouter();
@@ -24,9 +25,9 @@ const Dashboard = () => {
       setTotalIncidents(response.data.count);
       console.log('object',totalIncidents)
       if(response.status == 200){
-        return alert("incidents fetched successfully");
+        return toast.success("incidents fetched successfully");
       }
-      return alert("fetching failed");
+      return toast.error("fetching failed");
 
     } catch(error) {
       console.log(error);
@@ -50,9 +51,40 @@ const Dashboard = () => {
     const openIncidentsCount = openIncidentsData.length;
     const closedIncidentsCount = closedIncidentsData.length;
 
-    // console.log('cid',closedIncidentsData);
+    console.log('cid',closedIncidentsData);
     // console.log('Number of Open Incidents:', openIncidentsCount);
     // console.log('Number of Closed Incidents:', closedIncidentsCount);
+
+
+    const calculateDifferenceInDays = (startDate, endDate) => {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      return (end - start) / (1000 * 60 * 60 * 24); // Convert milliseconds to days
+    };
+    
+    let totalDays = 0;
+    let maxDays = -Infinity;
+    let minDays = Infinity;
+    let count = 0;
+    
+    closedIncidentsData.forEach(incident => {
+      if (incident.dateOfInput && incident.incidentClosedOn) {
+        const daysDifference = calculateDifferenceInDays(incident.dateOfInput, incident.incidentClosedOn);
+        totalDays += daysDifference;
+        maxDays = Math.max(maxDays, daysDifference);
+        minDays = Math.min(minDays, daysDifference);
+        count++;
+      }
+    });
+    
+    const averageDays = totalDays / count;
+    const maxClosingTime = maxDays > 365 ? `${(maxDays / 365).toFixed(2)} years` : `${maxDays.toFixed(2)} days`;
+    
+    console.log(`Average Closing Time: ${averageDays.toFixed(2)} days`);
+    console.log(`Max Closing Time: ${maxClosingTime}`);
+    console.log(`Min Closing Time: ${minDays.toFixed(2)} days`);
+
+
 
   return (
     <div>
@@ -90,14 +122,14 @@ const Dashboard = () => {
         <Grid item xs={6}>
           <Card className='shadow-md'>
             <CardContent>
-              <Typography variant='h6'>
-                Average Closing Time: XX
+              <Typography variant='h6' color={'#12a1c0'} sx={{ fontWeight: 'bold'}} >
+                Average Closing Time: <span style={{ color: 'black', fontWeight: 'bold' }}>{averageDays.toFixed(2)} days </span>
               </Typography>
-              <Typography variant='h6'>
-                Max Closing Time: XX
+              <Typography variant='h6' color={'black'} sx={{ fontWeight: 'bold'}} >
+                Max Closing Time: <span style={{ color: '#12a1c0', fontWeight: 'bold' }}>{maxClosingTime}</span>
               </Typography>
-              <Typography variant='h6'>
-                Min Closing Time: XX
+              <Typography variant='h6' color={'black'} sx={{ fontWeight: 'bold'}} >
+                Min Closing Time: <span style={{ color: '#12a1c0', fontWeight: 'bold' }}>{minDays.toFixed(2)} days</span>
               </Typography>
             </CardContent>
           </Card>

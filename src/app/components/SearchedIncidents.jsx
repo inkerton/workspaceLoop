@@ -29,6 +29,7 @@ import {
 } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 function SearchedIncidents({ data }) {
   const router = useRouter();
@@ -37,6 +38,7 @@ function SearchedIncidents({ data }) {
   const [selectedIncident, setSelectedIncident] = useState(null);
   const [status, setStatus] = useState("FINAL_REPORT_SUBMITTED");
   const [incidentNo, setIncidentNo] = useState("");
+  const [incidentClosedOn, setIncidentClosedOn] = useState("");
 
   const statusMap = {
     ASSIGNED: "Assigned",
@@ -109,7 +111,8 @@ function SearchedIncidents({ data }) {
         size: 150,
       },
       {
-        accessorFn: (row) => row.assignedTo.join(", "),
+        // accessorFn: (row) => row.assignedTo.join(", "),
+        accessorFn: (row) => Array.isArray(row.assignedTo) ? row.assignedTo.join(", ") : "",
         id: "assignedTo",
         header: "Assigned To",
         size: 150,
@@ -216,6 +219,11 @@ function SearchedIncidents({ data }) {
     },
 
     muiTableBodyRowProps: ({ row }) => ({
+      // Add row click handling
+      onClick: (event) => {
+        console.log("Row clicked:", row.original.incidentNo);
+        // router.push(`/dashboard/viewIncident/${row.original.incidentNo}`)
+      },
       sx: {
         cursor: "pointer",
         "&:hover": {
@@ -223,31 +231,26 @@ function SearchedIncidents({ data }) {
         },
       },
     }),
-
+    muiTableHeadCellProps: ({ column }) => ({
+      sx: {
+        backgroundColor:
+          column.id === "mrt-row-actions" ? "#12a1c0" : "#12a1c0",
+        color: column.id === "mrt-row-actions" ? "black" : "white",
+        fontWeight: "bold",
+        border: "1px solid #ddd",
+        padding: "8px",
+      },
+    }),
     muiTableProps: {
       sx: {
-        // Custom table styles
         borderCollapse: "collapse",
         width: "100%",
         border: "1px solid #ddd",
         borderRadius: 4,
         boxShadow: "0px 2px 10px #ddd",
-
-        // Header styling
-        "& .MuiTableCell-head": {
-          backgroundColor: "#12a1c0",
-          color: "white",
-          fontWeight: "bold",
-          border: "1px solid #ddd",
-          padding: "8px",
-        },
-
-        // Cell styling
         "& .MuiTableCell-body": {
           border: "1px solid #ddd",
         },
-
-        // Hover effect for rows
         "& .MuiTableRow-root:hover": {
           backgroundColor: "#eee",
         },
@@ -269,37 +272,39 @@ function SearchedIncidents({ data }) {
   };
 
   const handleUpdate = async () => {
-    if (status != "CLOSED_INCIDENT") {
+    if (status === "CLOSED_INCIDENT") {
+      setIncidentClosedOn(new Date().toISOString().split("T")[0]);
       setOpenConfirmationModal(true);
     } else {
-      await updateIncident();
+      await updateStatus();
     }
   };
 
   const handleConfirmCloseIncident = async (confirm) => {
     setOpenConfirmationModal(false);
     if (confirm) {
-      await updateIncident();
+      await updateStatus();
       setOpenModal(false);
     }
   };
 
-  const updateIncident = async () => {
+  const updateStatus = async () => {
     try {
       const response = await axios.put("/api/newincident", {
         incidentNo,
         status,
+        incidentClosedOn,
       });
       if (response.status === 200) {
         setOpenModal(false);
         window.location.reload();
-        alert("Incident updated successfully");
+        toast.success("Incident updated successfully");
       } else {
-        alert("Failed to update incident");
+        toast.error("Failed to update incident");
       }
     } catch (error) {
       console.log(error);
-      alert("An error occurred while updating the incident");
+      toast.error("An error occurred while updating the incident" + error);
     }
   };
 
@@ -380,9 +385,7 @@ function SearchedIncidents({ data }) {
                     <MenuItem value="REPORT_BEING_PREPARED">
                       Report Being Prepared
                     </MenuItem>
-                    <MenuItem value="FINAL_REPORT_SUBMITTED">
-                      Final Report Submitted
-                    </MenuItem>
+                    <MenuItem value="CLOSED_INCIDENT">Close Incident</MenuItem>
                   </TextField>
                 </Grid>
               </Box>
@@ -446,8 +449,14 @@ function SearchedIncidents({ data }) {
           }}
         >
           <Typography variant="h6" id="confirmation-dialog-description">
-            Are you sure you want to reopen this incident?
+            Are you sure you want to close this incident?
+            <br></br>
+            Incident closed on:{" "}
+            <span style={{ color: "#12a1c0", fontWeight: "bold" }}>
+              {incidentClosedOn}
+            </span>
           </Typography>
+
           <div className="flex justify-end mt-2">
             <Button
               variant="contained"

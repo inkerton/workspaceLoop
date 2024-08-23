@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import axios from 'axios';
 import dayjs from 'dayjs';
+import { toast } from 'react-toastify';
 
 
 
@@ -36,16 +37,16 @@ function ViewIncident({ params }) {
 
       const getUsers = async ()=>{
         try {
-          const response = await axios.get('/api/auth');
+          const response = await axios.get('/api/register');
           const data = response.data.data;
           console.log(data);
           if(response.status == 200){
             const userOptions = data.map(user => user.username);
             console.log(userOptions);
             setAssignedToOptions(userOptions);
-            alert("data fetched successfully");
+            toast.success("data fetched successfully");
           } else {
-            alert("could not get document count");
+            toast.error("could not get document count");
           }
     
         } catch(error) {
@@ -74,8 +75,7 @@ function ViewIncident({ params }) {
             }
             
             if (response.status == 200) {
-                // return alert('fetched successfully');
-                console.log('success');
+                return toast.success('fetched successfully');
             } else {
                 console.log('something went wrong')
             }
@@ -473,7 +473,60 @@ function ViewIncident({ params }) {
                                         </Grid>
                                     )}
 
-                                   
+                                   {/* Grid item for Log Collection Details */}
+                                   {/* {incidentInfo.logCollectionDetails && (
+                                    <Grid item xs={12}>
+                                    <Box
+                                      className="flex"
+                                      sx={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: 2,
+                                        mb: 2,
+                                      }}
+                                    >
+                                      <Grid item xs={3}>
+                                        <Typography variant="h6">
+                                          Log Collection Details:
+                                        </Typography>
+                                      </Grid>
+              
+                                      <Grid item xs={9}>
+                                        <FormControl component="fieldset">
+                                          <RadioGroup
+                                            row
+                                            value={selectedLogOption}
+                                            onChange={handleLogOptionChange}
+                                          >
+                                            <FormControlLabel
+                                              value="editor"
+                                              control={<Radio />}
+                                              label="Editor"
+                                            />
+                                          </RadioGroup>
+                                        </FormControl>
+              
+                                        {selectedLogOption === "editor" && (
+                                          <Editor
+                                            //   initialValue="These are the formats for all! Add image like this:- ![image](https://uicdn.toast.com/toastui/img/tui-editor-bi.png) In WYSIWYG, right click on the table for more options... For more information visit [Editor](https://github.com/nhn/tui.editor). "
+                                            previewStyle="vertical"
+                                            height="600px"
+                                            initialEditType="wysiwyg"
+                                            useCommandShortcut={true}
+                                            ref={editorRef}
+                                            onChange={() => {
+                                                if (editorRef.current) {
+                                                    const editorInstance = editorRef.current.getInstance();
+                                                    setLogCollectionDetails(editorInstance.getMarkdown());
+                                                }
+                                            }}
+                                              
+                                          />
+                                        )}
+                                      </Grid>
+                                    </Box>
+                                  </Grid>
+                                   )} */}
 
 
                                 </>
