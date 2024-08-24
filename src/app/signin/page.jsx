@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation'; 
-import { signIn} from 'next-auth/react';
+import { signIn } from 'next-auth/react';
 
 function SignIn() {
     const [username, setUsername] = useState("");
@@ -17,7 +17,7 @@ function SignIn() {
         
         try {
 
-            const res = signIn("credentials", {
+            const res = await signIn("credentials", {
                 username: username,
                 password: password,
                 redirect: false
@@ -29,24 +29,25 @@ function SignIn() {
             }
             router.replace("/dashboard");
           // Check if the user exists
-        //   const response = await axios.post('api/auth', {
-        //       username,
-        //       password
-        //   }, {
-        //       headers: {
-        //           'Content-Type': 'application/json'
-        //       }
-        //   });        
+          const response = await axios.post('api/auth', {
+              username,
+              password
+          }, {
+              headers: {
+                  'Content-Type': 'application/json'
+              }
+          });        
+          console.log('response', response)
         
-        // if (response.status === 200 && response.data.exists) {
-        //           alert("Logged in successfully");
-        //           router.push('/dashboard'); 
-        //   } else {
-        //       alert("User not found");
-        //   }
+        if (response.status === 200 ) {
+                  alert("Logged in successfully");
+                  router.push('/dashboard'); 
+          } else {
+              alert("User not found inside");
+          }
       } catch (error) {
           console.error("An error occurred:", error);
-          alert("User not found");
+          alert("User not found outside");
       }
     };
 

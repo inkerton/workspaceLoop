@@ -3,6 +3,8 @@ import dbConnect from '@/utils/mongodb';
 import NextAuth from 'next-auth/next';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { useCallback } from 'react';
+import { cookies } from 'next/headers';
+
 
 async function login(credentials){
     try{
@@ -32,6 +34,9 @@ export const authOptions = {
                     const user = await login(credentials); 
                     console.log({credentials});
                     if (user) {
+                        console.log('user is:',user)
+                        cookies().set('username', user.username);
+                        cookies().set('email', user.email);
                         return user;
                     } else {
                         return null;
@@ -67,3 +72,11 @@ export const authOptions = {
 
 const handler = NextAuth(authOptions);
 export { handler as GET, handler as POST };
+
+export const loginAction = async () => {
+    await signIn('github');
+}
+
+export const logoutAction = async () => {
+    await signOut();
+}
