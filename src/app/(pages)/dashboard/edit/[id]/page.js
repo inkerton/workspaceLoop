@@ -32,6 +32,8 @@ import entityImpactedOptions from '@/app/components/Options/EntityImpactedOption
 import allInputSourceOptions from '@/app/components/Options/InputSourceOptions';
 import dayjs from 'dayjs';
 import { toast } from 'react-toastify';
+import { Editor } from '@toast-ui/react-editor';
+
 
 
 
@@ -63,6 +65,11 @@ function page({ params }) {
     const [miscellaneousInfo, setMiscellaneousInfo] = useState("");
     const [TTPDetails, setTTPDetails] = useState([]);
 
+    const [selectedLogOption, setSelectedLogOption] = useState("");
+    const handleLogOptionChange = (event) => {
+        setSelectedLogOption(event.target.value);
+      };
+    const editorRef = React.createRef(null);
 
 
 
@@ -106,6 +113,7 @@ function page({ params }) {
             setIncidentInfo(response.data.additionalInfo || null);
             setEntryPointOfContactName(additionalInfo.entryPointOfContactName);
             setEntryPointOfContactNumber(additionalInfo.entryPointOfContactNumber);
+            setLogCollectionDetails(additionalInfo.logCollectionDetails);
             setMiscellaneousInfo(additionalInfo.miscellaneousInfo);
             setArtifacts(additionalInfo.artifacts);
             setTTPDetails(additionalInfo.TTPDetails);
@@ -209,130 +217,6 @@ function page({ params }) {
 
   return (
     <div>
-      <div>
-      <Card
-              sx={{
-                backgroundColor: "#E6F9FD",
-                mt: 2,
-                mb: 2,
-                boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-              }}
-            >
-              <CardContent>
-                <Typography
-                variant="h4"
-                color={"#12a1c0"}
-                sx={{ fontWeight: "bold", mb: 2 }}
-                >
-                {currentID}
-                </Typography>
-                <Divider />
-                <Grid container spacing={2}>
-                  {/* status */}
-                  <Grid item xs={12}>
-                    <Box
-                      className="flex"
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 2,
-                        mb: 2,
-                        ml: 6,
-                        mr: 6,
-                      }}
-                    >
-                      <Grid item xs={3}>
-                        <Typography variant="h6">Status:</Typography>
-                      </Grid>
-
-                      <Grid item xs={9}>
-                        <TextField
-                          select
-                          label="status"
-                          defaultValue="Assigned"
-                          value={status}
-                          onChange={(e) => setStatus(e.target.value)}
-                          margin="normal"
-                          fullWidth
-                          sx={{ flexGrow: 1, backgroundColor: "white" }}
-                        >
-                          <MenuItem value="ASSIGNED">Assigned</MenuItem>
-                          <MenuItem value="UNASSIGNED">Unassigned</MenuItem>
-                          <MenuItem value="INFORMATION_AWAITED">
-                            Information Awaited
-                          </MenuItem>
-                          <MenuItem value="PROCESSING">Processing</MenuItem>
-                          <MenuItem value="TEAM_SENT">Team Sent</MenuItem>
-                          <MenuItem value="REPORT_BEING_PREPARED">
-                            Report Being Prepared
-                          </MenuItem>
-                        </TextField>
-                      </Grid>
-                    </Box>
-                  </Grid>
-
-                  <Grid item xs={12}>
-                    <Box
-                      className="flex"
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 2,
-                        mb: 2,
-                        ml: 6,
-                        mr: 6,
-                      }}
-                    >
-                      <Grid item xs={3}>
-                        <Typography variant="h6">Assigned To:</Typography>
-                      </Grid>
-
-                      <Grid item xs={9}>
-                        <Autocomplete
-                          multiple
-                          fullWidth
-                          options={assignedToOptions}
-                          getOptionLabel={(option) => option}
-                          value={assignedTo}
-                          onChange={handleSelectionChange}
-                          sx={{ flexGrow: 1, backgroundColor: "white" }}
-                          renderTags={(value, getTagProps) =>
-                            value.map((option, index) => (
-                              <Chip
-                                variant="outlined"
-                                label={option}
-                                {...getTagProps({ index })}
-                              />
-                            ))
-                          }
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              variant="outlined"
-                              label="Assigned To"
-                              placeholder="Select users"
-                              fullWidth
-                              sx={{ flexGrow: 1, backgroundColor: "white" }}
-                            />
-                          )}
-                        />
-                      </Grid>
-                    </Box>
-                  </Grid>
-                </Grid>
-                <div className="flex justify-end">
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    sx={{ mr: 4, backgroundColor: "#12a1c0", color: "#fff" }}
-                    onClick={handleUpdate}
-                  >
-                    Update
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-      </div>
 
       <div>
       <Box component="form" onSubmit={handleUpdate} sx={{ p: 2, maxWidth: 1000, mx: 'auto' }} >
@@ -914,8 +798,145 @@ function page({ params }) {
                                     </Grid>
                                     )}
 
-                                   
+                                   {/* Grid for Log Collection Details */}
+                                   {incidentInfo.logCollectionDetails && (
+                                  //   <Grid item xs={12}>
+                                  //   <Box
+                                  //     className="flex"
+                                  //     sx={{
+                                  //       display: "flex",
+                                  //       alignItems: "center",
+                                  //       gap: 2,
+                                  //       mb: 2,
+                                  //     }}
+                                  //   >
+                                  //     <Grid item xs={3}>
+                                  //       <Typography variant="h6">
+                                  //         Log Collection Details:
+                                  //       </Typography>
+                                  //     </Grid>
+              
+                                  //     <Grid item xs={9}>
+                                  //       <FormControl component="fieldset">
+                                  //         <RadioGroup
+                                  //           row
+                                  //           value={selectedLogOption}
+                                  //           onChange={handleLogOptionChange}
+                                  //         >
+                                  //           <FormControlLabel
+                                  //             value="editor"
+                                  //             control={<Radio />}
+                                  //             label="Editor"
+                                  //           />
+                                  //         </RadioGroup>
+                                  //       </FormControl>
+              
+                                  //       {selectedLogOption === "editor" && (
+                                  //         <Editor
+                                  //         initialValue='janvi'
+                                  //           previewStyle="vertical"
+                                  //           height="600px"
+                                  //           initialEditType="wysiwyg"
+                                  //           useCommandShortcut={true}
+                                  //           ref={editorRef}
+                                  //           // initialValue={incidentInfo.logCollectionDetails}
+                                  //           // onChange={() => {
+                                  //           //     if (editorRef.current) {
+                                  //           //         const editorInstance = editorRef.current.getInstance();
+                                  //           //         setLogCollectionDetails(editorInstance.getMarkdown());
+                                  //           //     }
+                                  //           // }}
+                                              
+                                  //         />
+                                  //       )}
+                                  //     </Grid>
+                                  //   </Box>
+                                  // </Grid>
 
+                                  <Grid item xs={12}>
+                                  <Box
+                                    className="flex"
+                                    sx={{
+                                      display: "flex",
+                                      alignItems: "center",
+                                      gap: 2,
+                                      mb: 2,
+                                    }}
+                                  >
+                                    <Grid item xs={3}>
+                                      <Typography variant="h6">
+                                        Log Collection Details:
+                                      </Typography>
+                                    </Grid>
+
+                                    <Grid item xs={9}>
+                                      <FormControl component="fieldset">
+                                        <RadioGroup
+                                          row
+                                          value={selectedLogOption}
+                                          onChange={handleLogOptionChange}
+                                        >
+                                          <FormControlLabel
+                                            value="plainText"
+                                            control={<Radio />}
+                                            label="Plain Text"
+                                          />
+                                          <FormControlLabel
+                                            value="editor"
+                                            control={<Radio />}
+                                            label="Editor"
+                                          />
+                                        </RadioGroup>
+                                      </FormControl>
+
+                                      {selectedLogOption === "plainText" && (
+                                        <TextareaAutosize
+                                          placeholder="Log Details"
+                                          minRows={2}
+                                          maxRows={2000}
+                                          style={{
+                                            width: "100%",
+                                            border: "1px solid black",
+                                            borderRadius: "4px",
+                                            padding: "8px",
+                                            boxSizing: "border-box",
+                                            transition: "border-color 0.3s",
+                                            outline: "none",
+                                          }}
+                                          onFocus={(e) =>
+                                            (e.target.style.borderColor = "#12a1c0")
+                                          }
+                                          onBlur={(e) =>
+                                            (e.target.style.borderColor = "black")
+                                          }
+                                          value={logCollectionDetails}
+                                          onChange={(e) =>
+                                            setLogCollectionDetails(e.target.value)
+                                          }
+                                        />
+                                      )}
+
+                                      {selectedLogOption === "editor" && (
+                                        <Editor
+                                          initialValue='{logCollectionDetails}'
+                                          previewStyle="vertical"
+                                          height="600px"
+                                          initialEditType="wysiwyg"
+                                          useCommandShortcut={true}
+                                          ref={editorRef}
+                                          // onChange={() => {
+                                          //     if (editorRef.current) {
+                                          //         const editorInstance = editorRef.current.getInstance();
+                                          //         setLogCollectionDetails(editorInstance.getMarkdown());
+                                          //     }
+                                          // }}
+                                            // onChange={handleEditorChange}
+                                        />
+                                      )}
+                                    </Grid>
+                                  </Box>
+                                </Grid>
+                                   )}
 
                                 </>
                                 )}
@@ -924,7 +945,7 @@ function page({ params }) {
           
           <div className='flex justify-end'>
             <Button type="submit" variant="contained" color="primary" sx={{ mt: 2, mb: 14, backgroundColor: '#12a1c0', color: '#fff' }}>
-              Submit New Incident
+              Submit Changes
             </Button>
           </div>
 

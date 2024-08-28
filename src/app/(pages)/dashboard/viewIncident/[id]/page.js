@@ -10,6 +10,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import { toast } from 'react-toastify';
+import DrawerComponent from '@/app/components/Drawer';
 
 
 
@@ -24,6 +25,21 @@ function ViewIncident({ params }) {
     const [assignedToOptions, setAssignedToOptions] = useState([]);
     // const formattedDate = new Date(incidentData.dateOfInput).toLocaleString();
     const formattedDate = dayjs(incidentData.dateOfInput).format('DD-MMM-YYYY');
+    const [selectedLogOption, setSelectedLogOption] = useState("");
+    const handleLogOptionChange = (event) => {
+        setSelectedLogOption(event.target.value);
+      };
+    const editorRef = React.createRef(null);
+
+    const [drawerOpen, setDrawerOpen] = useState(false);
+
+    const handleDrawerOpen = () => {
+        setDrawerOpen(true);
+    };
+
+    const handleDrawerClose = () => {
+        setDrawerOpen(false);
+    };
 
     const statusMapping = {
         ASSIGNED: "Assigned",
@@ -187,7 +203,7 @@ function ViewIncident({ params }) {
 
                         <div>
                             <section>
-                                <div className='p-4'>
+                                <div className='p-6'>
                                     <Grid container spacing={2}>
                                     <Grid item xs={12}>
                                         <Box className="flex" sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
@@ -337,6 +353,23 @@ function ViewIncident({ params }) {
                                         </Grid>
 
                                         </Box>
+                                        <div className='flex justify-end flex-end'>
+                                            <Button 
+                                            variant="contained" 
+                                            color="primary" 
+                                            sx={{
+                                                backgroundColor: '#12a1c0', 
+                                                color: '#fff',
+                                                '&:hover': {
+                                                backgroundColor: '#0F839D',
+                                                }, 
+                                            }}
+                                            onClick={handleDrawerOpen}>
+                                                Open Comments Section
+                                            </Button>
+                                        </div>
+
+                                        <DrawerComponent incidentNo={currentID} open={drawerOpen} onClose={handleDrawerClose} />
                                     </Grid>
 
                                 {incidentInfo !== null && (
@@ -396,6 +429,7 @@ function ViewIncident({ params }) {
                                     ) : null}
 
                                     {/* Grid item for Artifacts  */}
+                                    {incidentInfo.artifacts && (
                                     <Grid item xs={12}>
                                         <Box className="flex" sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
 
@@ -418,6 +452,7 @@ function ViewIncident({ params }) {
 
                                         </Box>
                                     </Grid>
+                                    )}
 
                                     {/* Grid item for Miscellaneous Info */}
                                     {incidentInfo.miscellaneousInfo && (
@@ -474,7 +509,7 @@ function ViewIncident({ params }) {
                                     )}
 
                                    {/* Grid item for Log Collection Details */}
-                                   {/* {incidentInfo.logCollectionDetails && (
+                                   {incidentInfo.logCollectionDetails && (
                                     <Grid item xs={12}>
                                     <Box
                                       className="flex"
@@ -514,19 +549,20 @@ function ViewIncident({ params }) {
                                             initialEditType="wysiwyg"
                                             useCommandShortcut={true}
                                             ref={editorRef}
-                                            onChange={() => {
-                                                if (editorRef.current) {
-                                                    const editorInstance = editorRef.current.getInstance();
-                                                    setLogCollectionDetails(editorInstance.getMarkdown());
-                                                }
-                                            }}
+                                            initialValue={incidentInfo.logCollectionDetails}
+                                            // onChange={() => {
+                                            //     if (editorRef.current) {
+                                            //         const editorInstance = editorRef.current.getInstance();
+                                            //         setLogCollectionDetails(editorInstance.getMarkdown());
+                                            //     }
+                                            // }}
                                               
                                           />
                                         )}
                                       </Grid>
                                     </Box>
                                   </Grid>
-                                   )} */}
+                                   )}
 
 
                                 </>

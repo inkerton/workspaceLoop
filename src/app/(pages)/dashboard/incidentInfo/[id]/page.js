@@ -88,6 +88,7 @@ function page({ params }) {
       setIncidentNo(data.incidentNo);
 
       if (response.status == 200) {
+        router.push(`/dashboard/viewIncident/${incidentNo}`);
         return toast.success('fetched successfully');
       } else {
         console.log("something went wrong");

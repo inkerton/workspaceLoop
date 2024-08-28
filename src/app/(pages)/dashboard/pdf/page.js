@@ -2,10 +2,20 @@
 import { Button } from '@mui/material';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import DrawerComponent from '@/app/components/Drawer';
 
 export default function UploadForm() {
   const [files, setFiles] = useState([]);
   const [index, setIndex] = useState(0);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const handleDrawerOpen = () => {
+    setDrawerOpen(true);
+  };
+
+  const handleDrawerClose = () => {
+    setDrawerOpen(false);
+  };
 
   const handleGetIncidentsCount = async () => {
     console.log("Button clicked");
@@ -66,6 +76,12 @@ export default function UploadForm() {
     <Button onClick={handleGetIncidentsCount}>Get Count (Initial Fetch)</Button>
     <Button onClick={handleGetIncidentsCount}>Refresh Count</Button>
     <p className='p-4'>{index}</p>
+
+    <div>
+        <Button onClick={handleDrawerOpen}>Open Drawer</Button>
+      </div>
+
+      <DrawerComponent open={drawerOpen} onClose={handleDrawerClose} />
     </div>
   );
 }

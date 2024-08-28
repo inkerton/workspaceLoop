@@ -45,7 +45,6 @@ export async function PUT(request) {
     const { incidentNo, status, incidentClosedOn } = await request.json();
 
     const incident = await NewIncident.findOne({ incidentNo });
-    console.log(incident)
 
     if (!incident) {
       return NextResponse.json({ message: "Incident not found" }, { status: 404 });
