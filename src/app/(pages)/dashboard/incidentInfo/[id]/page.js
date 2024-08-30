@@ -74,8 +74,6 @@ function page({ params }) {
   //   }
   // };
 
-
-
   const getIncidentInfo = async (incidentNo) => {
     try {
       const response = await axios.get(
@@ -88,8 +86,7 @@ function page({ params }) {
       setIncidentNo(data.incidentNo);
 
       if (response.status == 200) {
-        router.push(`/dashboard/viewIncident/${incidentNo}`);
-        return toast.success('fetched successfully');
+        return toast.success("fetched successfully");
       } else {
         console.log("something went wrong");
         toast.error("something went wrong");
@@ -105,7 +102,6 @@ function page({ params }) {
       getIncidentInfo(currentID);
     }
   }, [currentID]);
-
 
   const handleTTPDetailsChange = (event, value) => {
     // Flatten chipOptions and find matching options
@@ -146,18 +142,18 @@ function page({ params }) {
     console.log(formData);
     formData.append("entryPointOfContactNumber", entryPointOfContactNumber);
     formData.append("logCollectionDetails", logCollectionDetails);
-    console.log('object',logCollectionDetails);
+    console.log("object", logCollectionDetails);
     formData.append("artifacts", artifacts);
     formData.append("miscellaneousInfo", miscellaneousInfo);
     formData.append("TTPDetails", JSON.stringify(TTPDetails));
     const allpdf = [];
-    
+
     pdfFiles.forEach((file, index) => {
       allpdf.push({ [`pdfFiles[${index}]`]: file });
-      console.log('ffiillee',file);
+      console.log("ffiillee", file);
     });
-    formData.append('allpdf', allpdf);
-    console.log('json pdf',allpdf);
+    formData.append("allpdf", allpdf);
+    console.log("json pdf", allpdf);
 
     // await new Promise((resolve) => setTimeout(resolve, 0));
     // formData.append("logCollectionDetails", logCollectionDetails);
@@ -175,7 +171,7 @@ function page({ params }) {
       console.log("Response:", response.data);
       if (response.status == 200) {
         console.log("Incident info stored successfully");
-        toast.success("Incident info stored successfully")
+        toast.success("Incident info stored successfully");
       } else {
         toast.error("Could not Store info");
       }
@@ -184,7 +180,6 @@ function page({ params }) {
       console.log("Error uploading data:", error);
     }
   };
-
 
   // const handleSubmit = async (event) => {
   //   event.preventDefault();
@@ -207,11 +202,8 @@ function page({ params }) {
 
   //   } catch (error){
   //     console.log(error);
-  //   }  
+  //   }
   // };
-
-
-
 
   // Flatten options with group info
   const options = chipOptions.flatMap((group) =>
@@ -238,14 +230,10 @@ function page({ params }) {
             </Typography>
             <Divider />
 
-            
-
             <div>
               <section>
                 <div className="p-4">
                   <Grid container spacing={2}>
-                    
-
                     {/* ttp details */}
                     <Grid item xs={12}>
                       <Box
@@ -472,12 +460,15 @@ function page({ params }) {
                               useCommandShortcut={true}
                               ref={editorRef}
                               onChange={() => {
-                                  if (editorRef.current) {
-                                      const editorInstance = editorRef.current.getInstance();
-                                      setLogCollectionDetails(editorInstance.getMarkdown());
-                                  }
+                                if (editorRef.current) {
+                                  const editorInstance =
+                                    editorRef.current.getInstance();
+                                  setLogCollectionDetails(
+                                    editorInstance.getMarkdown()
+                                  );
+                                }
                               }}
-                                // onChange={handleEditorChange}
+                              // onChange={handleEditorChange}
                             />
                           )}
                         </Grid>
@@ -646,9 +637,22 @@ function page({ params }) {
               </section>
             </div>
 
-            <Button variant="contained" color="primary" onClick={handleSubmit}>
+            <div className="flex justify-end">
+            <Button
+              variant="contained"
+              color="primary"
+              sx={{
+                backgroundColor: "#12a1c0",
+                color: "#fff",
+                "&:hover": {
+                  backgroundColor: "#0F839D",
+                },
+              }}
+              onClick={handleSubmit}
+            >
               Submit
             </Button>
+            </div>
           </CardContent>
         </Card>
       </div>

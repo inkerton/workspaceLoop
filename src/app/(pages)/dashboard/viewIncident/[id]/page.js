@@ -57,9 +57,7 @@ function ViewIncident({ params }) {
           const data = response.data.data;
           console.log(data);
           if(response.status == 200){
-            const userOptions = data.map(user => user.username);
-            console.log(userOptions);
-            setAssignedToOptions(userOptions);
+            setAssignedToOptions(data);
             toast.success("data fetched successfully");
           } else {
             toast.error("could not get document count");
@@ -585,6 +583,13 @@ function ViewIncident({ params }) {
                         <Button 
                         variant="contained" 
                         color="primary" 
+                        sx={{
+                            backgroundColor: '#12a1c0', 
+                            color: '#fff',
+                            '&:hover': {
+                            backgroundColor: '#0F839D',
+                            }, 
+                        }}
                         onClick={() => router.push('/dashboard')} 
                         startIcon={<ArrowBackIcon />}
                         >

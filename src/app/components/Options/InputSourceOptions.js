@@ -1,7 +1,4 @@
 const allInputSourceOptions = [
-  "mohan",
-  "ram",
-  "shyam",
   "NSE",
   "BSE",
   "SBI",

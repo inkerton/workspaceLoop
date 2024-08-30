@@ -14,7 +14,11 @@ const userSchema = new mongoose.Schema({
     email: {
         type: String,
         required: false,
-    }    
+    },
+    role: {
+        type: String,
+        required: true,
+    },    
 }, {timestamps: true})
 
 const User = mongoose.models.User || mongoose.model("User",userSchema)

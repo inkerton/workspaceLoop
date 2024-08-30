@@ -21,6 +21,12 @@ import Cookies from "js-cookie";
 const Dashboard = () => {
   const [incidentsData, setIncidentsData] = useState([]);
   const [totalIncidents, setTotalIncidents] = useState("");
+  const [username, setUsername] = useState("N");
+
+  const handleGetCookie = () => {
+    const cookie = Cookies.get("username");
+    setUsername(cookie);
+  };
 
   const getIncidents = async () => {
     try {
@@ -42,6 +48,7 @@ const Dashboard = () => {
 
   useEffect(() => {
       getIncidents();
+      handleGetCookie();
   }, []);
 
 
@@ -58,7 +65,6 @@ const Dashboard = () => {
   const openIncidentsCount = openIncidentsData.length;
   const closedIncidentsCount = closedIncidentsData.length;
 
-  console.log("cid", closedIncidentsData);
   // console.log('Number of Open Incidents:', openIncidentsCount);
   // console.log('Number of Closed Incidents:', closedIncidentsCount);
 
@@ -92,9 +98,9 @@ const Dashboard = () => {
       ? `${(maxDays / 365).toFixed(2)} years`
       : `${maxDays.toFixed(2)} days`;
 
-  console.log(`Average Closing Time: ${averageDays.toFixed(2)} days`);
-  console.log(`Max Closing Time: ${maxClosingTime}`);
-  console.log(`Min Closing Time: ${minDays.toFixed(2)} days`);
+  // console.log(`Average Closing Time: ${averageDays.toFixed(2)} days`);
+  // console.log(`Max Closing Time: ${maxClosingTime}`);
+  // console.log(`Min Closing Time: ${minDays.toFixed(2)} days`);
 
   return (
     <div>
@@ -186,12 +192,12 @@ const Dashboard = () => {
 
         <div>
           {/* Pass the filtered data to OpenIncidents component */}
-          <OpenIncidents data={openIncidentsData} />
+          <OpenIncidents data={openIncidentsData} username={username} />
         </div>
 
         <div>
           {/* Pass the filtered data to ClosedIncidents component */}
-          <ClosedIncidents data={closedIncidentsData} />
+          <ClosedIncidents data={closedIncidentsData} username={username} />
         </div>
       </Box>
       <Footer />

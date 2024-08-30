@@ -1,11 +1,14 @@
 'use client'
 import React, { useEffect } from 'react'
 import Image from 'next/image'
-import { CircleUserRound, LayoutGrid, Search, ShieldPlus } from 'lucide-react'
-import { usePathname } from 'next/navigation';
+import { CircleUserRound, DeleteIcon, LayoutGrid, Search, ShieldPlus, Trash2 } from 'lucide-react'
+import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { Button, Divider } from '@mui/material';
 
 function SideNav() {
+  const router = useRouter();
+
   const menuList= [
     {
       id:1,
@@ -54,8 +57,23 @@ function SideNav() {
         ))}
       </div>
       <div className='fixed bottom-10 p-5 flex gap-2 items-center'>
-        <CircleUserRound />
-        Profile
+        <Button 
+        type="submit"
+        variant="contained"
+        color="primary"
+        sx={{
+          width: '150px',
+          mt: 2,
+          mb: 2,
+          backgroundColor: "#12a1c0",
+          color: "#fff",
+          '&:hover': {
+              backgroundColor: '#0F839D',
+              }, 
+        }}
+        startIcon={<Trash2 />}
+        onClick={() => router.push('/dashboard/bin')} 
+        >Bin</Button>
       </div>
     </div>
   )

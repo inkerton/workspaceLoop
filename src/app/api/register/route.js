@@ -5,7 +5,7 @@ import User from "../../../model/User";
 
 export async function POST(request) {
     await dbConnect();
-    const { username, password, email } = await request.json();
+    const { username, password, email, role } = await request.json();
 
     try {
             // Register a new user
@@ -17,7 +17,7 @@ export async function POST(request) {
             // const hashedPassword = await bcrypt.hash(password, salt);
             // Create a new user (password should be hashed in a real application)
             // const newUser = new User({ username, password:hashedPassword, email });
-            const newUser = new User({ username, password, email });
+            const newUser = new User({ username, password, email, role });
 
             await newUser.save();
             return NextResponse.json({ message: 'User registered successfully' }, { status: 201 });

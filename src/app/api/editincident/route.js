@@ -26,6 +26,7 @@ export async function PUT(request) {
       brief,
       entryPointOfContactName,
       entryPointOfContactNumber,
+      logCollectionDetails,
       miscellaneousInfo,
       artifacts,
       TTPDetails
@@ -54,9 +55,10 @@ export async function PUT(request) {
     await incident.save();
 
     if (info) {
-      if (entryPointOfContactName || entryPointOfContactNumber || miscellaneousInfo || artifacts || TTPDetails) {
+      if (entryPointOfContactName || entryPointOfContactNumber || miscellaneousInfo || artifacts || TTPDetails || logCollectionDetails ) {
         if (entryPointOfContactName) info.entryPointOfContactName = entryPointOfContactName;
         if (entryPointOfContactNumber) info.entryPointOfContactNumber = entryPointOfContactNumber;
+        if (logCollectionDetails) info.logCollectionDetails = logCollectionDetails;
         if (miscellaneousInfo) info.miscellaneousInfo = miscellaneousInfo;
         if (artifacts) info.artifacts = artifacts;
         if (TTPDetails) info.TTPDetails = TTPDetails;

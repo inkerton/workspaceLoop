@@ -9,6 +9,7 @@ function SignUp() {
     const [username,setUsername] = useState("");
     const [password,setPassword] = useState("");
     const [email, setEmail] = useState('');
+    const [role, setRole] = useState('User');
 
     const [formData, setFormData] = useState({
         password: '',
@@ -38,13 +39,14 @@ function SignUp() {
         } else {
             setPassword(passwordConfirmation);
         }
-        console.log("user:", username, "pass:", password, "email: ", email);
+        console.log("user:", username, "pass:", password, "email: ", email, "role", role);
         try{
             // Submit form data
             const response = await axios.post('api/register', {
                 username,
                 password,
-                email
+                email,
+                role
             }, {
                 headers: {
                     'Content-Type': 'application/json'

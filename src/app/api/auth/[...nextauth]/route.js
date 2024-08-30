@@ -37,6 +37,7 @@ export const authOptions = {
                         console.log('user is:',user)
                         cookies().set('username', user.username);
                         cookies().set('email', user.email);
+                        cookies().set('role', user.role);
                         return user;
                     } else {
                         return null;
