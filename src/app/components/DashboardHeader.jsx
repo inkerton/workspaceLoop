@@ -14,8 +14,10 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import PersonAdd from "@mui/icons-material/PersonAdd";
 import Settings from "@mui/icons-material/Settings";
 import Logout from "@mui/icons-material/Logout";
+import { useRouter } from "next/navigation";
 
 function DashboardHeader() {
+  const router = useRouter();
   const [cookieValue, setCookieValue] = useState("");
   const [username, setUsername] = useState("N");
 
@@ -113,7 +115,7 @@ function DashboardHeader() {
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
-        <MenuItem onClick={handleClose}>
+        <MenuItem onClick={() => {router.push('/dashboard/profile');}}>
           <Avatar /> Profile
         </MenuItem>
         <Divider />
