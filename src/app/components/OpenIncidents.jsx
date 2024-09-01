@@ -334,7 +334,7 @@ function OpenIncidents({ data, username }) {
 
   const handleOpenModal = (incident) => {
     setOpenModal(true);
-
+    setTimeOfAction(new Date().toISOString());
     setStatus(incident.status);
     setIncidentNo(incident.incidentNo);
   };
@@ -349,7 +349,6 @@ function OpenIncidents({ data, username }) {
       setIncidentClosedOn(new Date().toISOString().split("T")[0]);
       setOpenConfirmationModal(true);
     } else {
-      setTimeOfAction(new Date().toISOString());
       await updateStatus();
     }
   };
@@ -357,7 +356,6 @@ function OpenIncidents({ data, username }) {
   const handleConfirmCloseIncident = async (confirm) => {
     setOpenConfirmationModal(false);
     if (confirm) {
-      setTimeOfAction(new Date().toISOString());
       await updateStatus();
       setOpenModal(false);
     }

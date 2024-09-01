@@ -34,6 +34,8 @@ import dayjs from "dayjs";
 import { toast } from "react-toastify";
 import { Editor } from "@toast-ui/react-editor";
 import '@toast-ui/editor/dist/toastui-editor.css';
+import Cookies from "js-cookie";
+
 
 
 const filter = createFilterOptions();
@@ -73,6 +75,15 @@ function page({ params }) {
     setSelectedLogOption(event.target.value);
   };
   const editorRef = React.createRef(null);
+
+  const [username, setUsername] = useState("N");
+  const [timeOfAction, setTimeOfAction] = useState("");
+
+
+  const handleGetCookie = () => {
+    const cookie = Cookies.get("username");
+    setUsername(cookie);
+  };
 
   const getUsers = async () => {
     try {
@@ -135,6 +146,7 @@ function page({ params }) {
     if (currentID) {
       getIncidentInfo(currentID);
       getUsers();
+      handleGetCookie();
     }
   }, [currentID]);
 
@@ -183,6 +195,8 @@ function page({ params }) {
       const response = await axios.put(
         "/api/editincident",
         {
+          username,
+          timeOfAction: new Date().toISOString(),
           incidentNo,
           assignedTo,
           comment,

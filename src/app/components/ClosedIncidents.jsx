@@ -42,6 +42,8 @@ function ClosedIncidents({ data, username }) {
   const [incidentNo, setIncidentNo] = useState("");
   const [incidentDeletedOn, setIncidentDeletedOn] = useState("");
   const [deletedOn, setDeletedOn] = useState("");
+  const [timeOfAction, setTimeOfAction] = useState("");
+
 
 
   const statusMap = {
@@ -312,6 +314,7 @@ function ClosedIncidents({ data, username }) {
 
   const handleOpenModal = (incident) => {
     setOpenModal(true);
+    setTimeOfAction(new Date().toISOString());
     setIncidentNo(incident.incidentNo);
   };
 
@@ -355,6 +358,8 @@ function ClosedIncidents({ data, username }) {
       const response = await axios.put("/api/newincident", {
         incidentNo,
         status,
+        timeOfAction,
+        username,
       });
       if (response.status === 200) {
         setOpenModal(false);
