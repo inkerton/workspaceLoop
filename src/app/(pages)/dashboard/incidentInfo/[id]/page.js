@@ -29,20 +29,20 @@ import InfoIcon from "@mui/icons-material/Info";
 // import { TextareaAutosize } from '@mui/base/TextareaAutosize';
 import { TextareaAutosize } from "@mui/base/TextareaAutosize";
 import "@toast-ui/editor/dist/toastui-editor.css";
-
 import { Editor } from "@toast-ui/react-editor";
 import { toast } from "react-toastify";
+import Cookies from "js-cookie";
 
 function page({ params }) {
   const router = useRouter();
   const currentID = params.id;
   console.log(currentID);
-  const [incidentData, setIncidentData] = useState([]);
+  const [incidentData, setIncidentData] = useState(null);
   console.log("incdata", incidentData);
   // setIncidentNo(currentID);
-
+  const [username, setUsername] = useState("N");
+  const [timeOfAction, setTimeOfAction] = useState("");
   const [incidentNo, setIncidentNo] = useState(currentID);
-  const [status, setStatus] = useState("ASSIGNED");
   const [TTPDetails, setTTPDetails] = useState([]);
   const [entryPointOfContactName, setEntryPointOfContactName] = useState("");
   const [entryPointOfContactNumber, setEntryPointOfContactNumber] =
@@ -56,7 +56,7 @@ function page({ params }) {
   const [selectedLogOption, setSelectedLogOption] = useState("");
   const editorRef = React.createRef(null);
 
-  const formattedDate = new Date(incidentData.dateOfInput).toLocaleString();
+  // const formattedDate = new Date(incidentData.dateOfInput).toLocaleString();
 
   // const [formData, setFormData] = useState( new FormData());
 
@@ -74,16 +74,27 @@ function page({ params }) {
   //   }
   // };
 
+  const handleGetCookie = () => {
+    const cookie = Cookies.get("username");
+    setUsername(cookie);
+  };
+
   const getIncidentInfo = async (incidentNo) => {
     try {
       const response = await axios.get(
-        `/api/incidents/?incidentNo=${encodeURIComponent(incidentNo)}`
+        `/api/incidentInfo/?incidentNo=${encodeURIComponent(incidentNo)}`
       );
-      const data = response.data.data;
+      const data = response.data;
       console.log("incidents data", data);
 
       setIncidentData(data);
       setIncidentNo(data.incidentNo);
+      setEntryPointOfContactName(data.entryPointOfContactName);
+      setEntryPointOfContactNumber(data.entryPointOfContactNumber);
+      setArtifacts(data.artifacts);
+      setTTPDetails(data.TTPDetails);
+      setMiscellaneousInfo(data.miscellaneousInfo);
+      setLogCollectionDetails(data.logCollectionDetails);
 
       if (response.status == 200) {
         return toast.success("fetched successfully");
@@ -100,6 +111,7 @@ function page({ params }) {
   useEffect(() => {
     if (currentID) {
       getIncidentInfo(currentID);
+      handleGetCookie();
     }
   }, [currentID]);
 
@@ -129,13 +141,10 @@ function page({ params }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // if (editorRef.current) {
-    //   const editorInstance = editorRef.current.getInstance();
-    //   setLogCollectionDetails(editorInstance.getMarkdown().toString());
-    // }
-    console.log("brief", logCollectionDetails);
 
     const formData = new FormData();
+    formData.append("username", username);
+    formData.append("timeOfAction", new Date().toISOString());
     formData.append("incidentNo", incidentNo);
     console.log(formData);
     formData.append("entryPointOfContactName", entryPointOfContactName);
@@ -154,9 +163,6 @@ function page({ params }) {
     });
     formData.append("allpdf", allpdf);
     console.log("json pdf", allpdf);
-
-    // await new Promise((resolve) => setTimeout(resolve, 0));
-    // formData.append("logCollectionDetails", logCollectionDetails);
 
     for (const [key, value] of formData.entries()) {
       console.log(`Key: ${key}, Value: ${value}`);
@@ -453,7 +459,7 @@ function page({ params }) {
 
                           {selectedLogOption === "editor" && (
                             <Editor
-                              //   initialValue="These are the formats for all! Add image like this:- ![image](https://uicdn.toast.com/toastui/img/tui-editor-bi.png) In WYSIWYG, right click on the table for more options... For more information visit [Editor](https://github.com/nhn/tui.editor). "
+                              initialValue={logCollectionDetails || 'Write'}
                               previewStyle="vertical"
                               height="600px"
                               initialEditType="wysiwyg"
@@ -637,22 +643,27 @@ function page({ params }) {
               </section>
             </div>
 
-            <div className="flex justify-end">
-            <Button
-              variant="contained"
-              color="primary"
-              sx={{
-                backgroundColor: "#12a1c0",
-                color: "#fff",
-                "&:hover": {
-                  backgroundColor: "#0F839D",
-                },
-              }}
-              onClick={handleSubmit}
-            >
-              Submit
-            </Button>
-            </div>
+            {incidentData === null && (
+              <>
+                <div className="flex justify-end">
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    sx={{
+                      backgroundColor: "#12a1c0",
+                      color: "#fff",
+                      "&:hover": {
+                        backgroundColor: "#0F839D",
+                      },
+                    }}
+                    // onClick={handleSubmit}
+                    onClick={(e) => handleSubmit(e) }
+                  >
+                    Submit
+                  </Button>
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
       </div>
