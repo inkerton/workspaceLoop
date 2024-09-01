@@ -29,6 +29,8 @@ import entityImpactedOptions from "@/app/components/Options/EntityImpactedOption
 import allInputSourceOptions from "@/app/components/Options/InputSourceOptions";
 import dayjs from "dayjs";
 import { toast } from "react-toastify";
+import Cookies from "js-cookie";
+
 
 const filter = createFilterOptions();
 
@@ -54,6 +56,8 @@ function getStyles(name, personName, theme) {
 
 function NewIncident() {
   const theme = useTheme();
+  const [username, setUsername] = useState("N");
+  const [timeOfAction, setTimeOfAction] = useState("");
   const [incidentNo, setIncidentNo] = useState("");
   const [inputSource, setInputSource] = useState(null);
   const [dateOfInput, setDateOfInput] = useState(null);
@@ -105,9 +109,15 @@ function NewIncident() {
     }
   };
 
+  const handleGetCookie = () => {
+    const cookie = Cookies.get("username");
+    setUsername(cookie);
+  };
+
   useEffect(() => {
     getIncidentsCount();
     getUsers();
+    handleGetCookie();
   }, []);
 
   useEffect(() => {
@@ -148,8 +158,9 @@ function NewIncident() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
+      // setTimeOfAction(new Date().toISOString());
+
       const response = await axios.post("/api/newincident", {
         incidentNo,
         inputSource,
@@ -160,6 +171,8 @@ function NewIncident() {
         assignedTo,
         status,
         comment,
+        timeOfAction,
+        username,
       });
       console.log("12121212121:", response.data);
       setIndex(index + 1);
@@ -593,6 +606,7 @@ function NewIncident() {
                 backgroundColor: "#0F839D",
               },
             }}
+            onClick={() => setTimeOfAction(new Date().toISOString())}
           >
             Submit New Incident
           </Button>

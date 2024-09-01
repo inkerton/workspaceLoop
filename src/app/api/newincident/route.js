@@ -6,13 +6,22 @@ import ChangeLog from '@/model/ChangeLogs';
 
 export async function POST(request){
   await dbConnect();
-  const {incidentNo, inputSource, dateOfInput, entityImpacted, category, brief, assignedTo, status, comment} = await request.json();
+  const {incidentNo, inputSource, dateOfInput, entityImpacted, category, brief, assignedTo, status, comment, timeOfAction, username} = await request.json();
   console.log('status',status);
 
   try {
     const newincident = new NewIncident({incidentNo, inputSource, dateOfInput, entityImpacted, category, brief, assignedTo, status, comment});
     console.log('newww',newincident)
     await newincident.save();
+
+    const changeLog = new ChangeLog({
+      username,
+      action: `New incident created ${incidentNo} `,
+      timeOfAction,
+  });
+
+  await changeLog.save();
+
     
     return NextResponse.json({message: "data stored successfully"},{status: 200});
 
