@@ -21,6 +21,8 @@ import {
 } from "@mui/material";
 import {
   AccountCircle,
+  AddCircle,
+  Delete,
   Dns,
   Edit,
   ProductionQuantityLimits,
@@ -31,7 +33,7 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-function OpenIncidents({ data }) {
+function OpenIncidents({ data, username }) {
   const router = useRouter();
   const [openModal, setOpenModal] = useState(false);
   const [selectedIncident, setSelectedIncident] = useState(null);
@@ -39,6 +41,11 @@ function OpenIncidents({ data }) {
   const [incidentNo, setIncidentNo] = useState("");
   const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
   const [incidentClosedOn, setIncidentClosedOn] = useState("");
+  const [timeOfAction, setTimeOfAction] = useState("");
+  const [incidentDeletedOn, setIncidentDeletedOn] = useState("");
+  const [deletedOn, setDeletedOn] = useState("");
+  const [openBinConfirmationModal, setOpenBinConfirmationModal] = useState(false);
+
 
   const statusMap = {
     ASSIGNED: "Assigned",
@@ -155,10 +162,7 @@ function OpenIncidents({ data }) {
       <MenuItem
         key={0}
         onClick={() => {
-          console.log("Row data:", row.original); // Log the entire row data
           const incId = row.original?.incidentNo; // Check property name
-          console.log("Incident ID:", incId); // Log the incident ID
-          // setIncidentNo(incId);
           if (incId) {
             router.push(`dashboard/viewIncident/${incId}`);
           } else {
@@ -177,10 +181,7 @@ function OpenIncidents({ data }) {
       <MenuItem
         key={1}
         onClick={() => {
-          console.log("Row data:", row.original); // Log the entire row data
           const incId = row.original?.incidentNo; // Check property name
-          console.log("Incident ID:", incId); // Log the incident ID
-          // setIncidentNo(incId);
           if (incId) {
             router.push(`dashboard/incidentInfo/${incId}`);
           } else {
@@ -191,7 +192,7 @@ function OpenIncidents({ data }) {
         sx={{ m: 0 }}
       >
         <ListItemIcon>
-          <Edit />
+          <AddCircle />
         </ListItemIcon>
         Add IncInfo
       </MenuItem>,
@@ -200,7 +201,6 @@ function OpenIncidents({ data }) {
         key={2}
         onClick={() => {
           const incId = row.original?.incidentNo; // Check property name
-          console.log("Incident ID:", incId); // Log the incident ID
           closeMenu();
           handleOpenModal(row.original);
         }}
@@ -213,12 +213,9 @@ function OpenIncidents({ data }) {
       </MenuItem>,
 
       <MenuItem
-        key={1}
+        key={3}
         onClick={() => {
-          console.log("Row data:", row.original); // Log the entire row data
           const incId = row.original?.incidentNo; // Check property name
-          console.log("Incident ID:", incId); // Log the incident ID
-          // setIncidentNo(incId);
           if (incId) {
             router.push(`dashboard/edit/${incId}`);
           } else {
@@ -232,6 +229,22 @@ function OpenIncidents({ data }) {
           <Edit />
         </ListItemIcon>
         Edit
+      </MenuItem>,
+
+      <MenuItem
+        key={4}
+        onClick={() => {
+          const incId = row.original?.incidentNo; // Check property name
+          setIncidentNo(incId);
+          closeMenu();
+          handleBinOpenModal();
+        }}
+        sx={{ m: 0 }}
+      >
+        <ListItemIcon>
+          <Delete />
+        </ListItemIcon>
+        Move to Bin
       </MenuItem>,
     ],
 
@@ -336,6 +349,7 @@ function OpenIncidents({ data }) {
       setIncidentClosedOn(new Date().toISOString().split("T")[0]);
       setOpenConfirmationModal(true);
     } else {
+      setTimeOfAction(new Date().toISOString());
       await updateStatus();
     }
   };
@@ -343,6 +357,7 @@ function OpenIncidents({ data }) {
   const handleConfirmCloseIncident = async (confirm) => {
     setOpenConfirmationModal(false);
     if (confirm) {
+      setTimeOfAction(new Date().toISOString());
       await updateStatus();
       setOpenModal(false);
     }
@@ -354,6 +369,8 @@ function OpenIncidents({ data }) {
         incidentNo,
         status,
         incidentClosedOn,
+        timeOfAction,
+        username,
       });
       if (response.status === 200) {
         setOpenModal(false);
@@ -365,6 +382,40 @@ function OpenIncidents({ data }) {
     } catch (error) {
       console.log(error);
       toast.error("An error occurred while updating the incident");
+    }
+  };
+
+  const handleBinOpenModal = (incident) => {
+    setOpenBinConfirmationModal(true);
+    setIncidentDeletedOn(new Date().toISOString().split("T")[0]);
+    setDeletedOn(new Date().toISOString());
+  };
+
+  const handleBinCloseModal = async (confirm) => {
+    setOpenBinConfirmationModal(false);
+    if (confirm) {
+      await updateBin();
+      setOpenBinConfirmationModal(false);
+    }
+  };
+
+  const updateBin = async () => {
+    try {
+      const response = await axios.post("/api/bin", {
+        incidentNo,
+        deletedOn,
+        deletedBy: username,
+      });
+      if (response.status === 200) {
+        setOpenModal(false);
+        window.location.reload();
+        toast.success("Incident moved to bin successfully");
+      } else {
+        alert("Failed to delete incident");
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("An error occurred while deleting the incident");
     }
   };
 
@@ -546,6 +597,72 @@ function OpenIncidents({ data }) {
                 },
               }}
               onClick={() => handleConfirmCloseIncident(true)}
+            >
+              Yes
+            </Button>
+          </div>
+        </Box>
+      </Modal>
+
+      {/* Confirmation Modal for Move to Bin */}
+      <Modal
+        open={openBinConfirmationModal}
+        onClose={() => setOpenBinConfirmationModal(false)}
+        aria-labelledby="confirmation-dialog"
+        aria-describedby="confirmation-dialog-description"
+      >
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 600,
+            bgcolor: "background.paper",
+            // border: '2px solid #000',
+            // boxShadow: 24,
+            borderRadius: "8px", // Rounded corners
+            boxShadow: "none", // No border
+            p: 4,
+          }}
+        >
+          <Typography variant="h6" id="confirmation-dialog-description">
+            Are you sure you want to move this incident to bin?
+            <br></br>
+            Incident deleted on:{" "}
+            <span style={{ color: "#12a1c0", fontWeight: "bold" }}>
+              {incidentDeletedOn}
+            </span>
+          </Typography>
+
+          <div className="flex justify-end mt-2">
+            <Button
+              variant="contained"
+              color="primary"
+              sx={{
+                mr: 4,
+                backgroundColor: "#12a1c0",
+                color: "#fff",
+                "&:hover": {
+                  backgroundColor: "#0F839D",
+                },
+              }}
+              onClick={() => handleBinCloseModal(false)}
+            >
+              No
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              sx={{
+                mr: 4,
+                backgroundColor: "#12a1c0",
+                color: "#fff",
+                "&:hover": {
+                  backgroundColor: "#0F839D",
+                },
+              }}
+              onClick={() => handleBinCloseModal(true)}
             >
               Yes
             </Button>

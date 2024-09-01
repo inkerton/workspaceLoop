@@ -2,6 +2,7 @@ import dbConnect from "@/utils/mongodb";
 import NewIncident from "@/model/NewIncident";
 import BinIncident from "@/model/Bin";
 import { NextResponse } from "next/server";
+import ChangeLog from "@/model/ChangeLogs";
 
 export async function POST(request){
     console.log('object bin')
@@ -30,8 +31,17 @@ export async function POST(request){
         });
 
         await binIncident.save();
-
+        
         await NewIncident.deleteOne({ incidentNo });
+
+        const changeLog = new ChangeLog({
+            username: deletedBy,
+            action: `Moved ${incidentNo} to bin`,
+            timeOfAction: deletedOn,
+        });
+
+        console.log('object change log', changeLog);
+        await changeLog.save();
 
         return NextResponse.json({ message: "Incident moved to bin" }, { status: 200 });
       

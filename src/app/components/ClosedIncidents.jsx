@@ -21,6 +21,7 @@ import {
 } from "@mui/material";
 import {
   AccountCircle,
+  Delete,
   Dns,
   Edit,
   ProductionQuantityLimits,
@@ -41,7 +42,6 @@ function ClosedIncidents({ data, username }) {
   const [incidentNo, setIncidentNo] = useState("");
   const [incidentDeletedOn, setIncidentDeletedOn] = useState("");
   const [deletedOn, setDeletedOn] = useState("");
-  console.log('object closed inc username:', username);
 
 
   const statusMap = {
@@ -216,12 +216,12 @@ function ClosedIncidents({ data, username }) {
           const incId = row.original?.incidentNo; // Check property name
           setIncidentNo(incId);
           closeMenu();
-          handleBinOpenModal(row.original);
+          handleBinOpenModal();
         }}
         sx={{ m: 0 }}
       >
         <ListItemIcon>
-          <TrackChangesOutlined />
+          <Delete />
         </ListItemIcon>
         Move to Bin
       </MenuItem>,
@@ -320,9 +320,8 @@ function ClosedIncidents({ data, username }) {
     setSelectedIncident(null);
   };
 
-  const handleBinOpenModal = (incident) => {
+  const handleBinOpenModal = () => {
     setOpenBinConfirmationModal(true);
-    setSelectedIncident(incident.incidentNo);
     setIncidentDeletedOn(new Date().toISOString().split("T")[0]);
     setDeletedOn(new Date().toISOString());
   };
@@ -331,8 +330,6 @@ function ClosedIncidents({ data, username }) {
     setOpenBinConfirmationModal(false);
     if (confirm) {
       await updateBin();
-      console.log('object confirmed to be deleted',selectedIncident);
-      setSelectedIncident(null);
       setOpenBinConfirmationModal(false);
     }
   };

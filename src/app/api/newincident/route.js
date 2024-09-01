@@ -2,6 +2,7 @@
 import dbConnect from '../../../utils/mongodb';
 import NewIncident from "../../../model/NewIncident";
 import { NextResponse } from 'next/server';
+import ChangeLog from '@/model/ChangeLogs';
 
 export async function POST(request){
   await dbConnect();
@@ -42,7 +43,7 @@ export async function GET(request) {
 export async function PUT(request) {
   await dbConnect();
   try {
-    const { incidentNo, status, incidentClosedOn } = await request.json();
+    const { incidentNo, status, incidentClosedOn, timeOfAction, username } = await request.json();
 
     const incident = await NewIncident.findOne({ incidentNo });
 
@@ -55,6 +56,14 @@ export async function PUT(request) {
     incident.incidentClosedOn = incidentClosedOn;
 
     await incident.save();
+
+    const changeLog = new ChangeLog({
+      username,
+      action: `Changed status of ${incidentNo} to ${status}`,
+      timeOfAction,
+  });
+
+  await changeLog.save();
 
     // return NextResponse.json({ message: "Incident updated successfully", data: incident }, { status: 200 });
     return NextResponse.json({ message: "Incident updated successfully" }, { status: 200 });
