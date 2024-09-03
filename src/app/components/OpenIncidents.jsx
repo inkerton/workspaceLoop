@@ -136,7 +136,7 @@ function OpenIncidents({ data, username }) {
 
     muiPaginationProps: {
       color: "secondary",
-      rowsPerPageOptions: [10, 20, 30, 50, 100, 200],
+      rowsPerPageOptions: [10, 20, 30, 50, 100, 250, 500],
       shape: "rounded",
       variant: "outlined",
     },
@@ -146,8 +146,8 @@ function OpenIncidents({ data, username }) {
           alignItems: "center",
           display: "flex",
           justifyContent: "space-around",
-          left: "30px",
-          maxWidth: "1000px",
+          // left: "50px",
+          maxWidth: "1400px",
           position: "sticky",
           width: "100%",
         }}
@@ -257,7 +257,6 @@ function OpenIncidents({ data, username }) {
     },
 
     muiTableBodyRowProps: ({ row }) => ({
-      // Add row click handling
       onClick: (event) => {
         console.log("Row clicked:", row.original.incidentNo);
         // router.push(`/dashboard/viewIncident/${row.original.incidentNo}`)

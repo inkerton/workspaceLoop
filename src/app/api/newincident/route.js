@@ -18,6 +18,7 @@ export async function POST(request){
       username,
       action: `New incident created ${incidentNo} `,
       timeOfAction,
+      incidentNo: incidentNo,
   });
 
   await changeLog.save();
@@ -70,6 +71,7 @@ export async function PUT(request) {
       username,
       action: `Changed status of ${incidentNo} to ${status}`,
       timeOfAction,
+      incidentNo: incidentNo,
   });
 
   await changeLog.save();

@@ -29,26 +29,29 @@ function SignIn() {
             }
             router.replace("/dashboard");
           // Check if the user exists
-          const response = await axios.post('api/auth', {
-              username,
-              password
-          }, {
-              headers: {
-                  'Content-Type': 'application/json'
-              }
-          });        
-          console.log('response', response)
+        //   const response = await axios.post('api/auth', {
+        //       username,
+        //       password
+        //   }, {
+        //       headers: {
+        //           'Content-Type': 'application/json'
+        //       }
+        //   });        
+        //   console.log('response', response)
         
-        if (response.status === 200 ) {
-                  alert("Logged in successfully");
-                  router.push('/dashboard'); 
-          } else {
-              alert("User not found inside");
-          }
-      } catch (error) {
-          console.error("An error occurred:", error);
-          alert("User not found outside");
-      }
+        // if (response.status === 200 ) {
+        //           alert("Logged in successfully");
+        //           router.push('/dashboard'); 
+        //   } else {
+        //       alert("User not found inside");
+        //   }
+      } 
+    //   catch (error) {
+    //       console.error("An error occurred:", error);
+    //   }
+    finally {
+        console.log('object')
+    }
     };
 
     return (
@@ -69,8 +72,7 @@ function SignIn() {
                         </h1>
 
                         <p className="mt-4 leading-relaxed text-gray-500">
-                            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Eligendi nam dolorum aliquam,
-                            quibusdam aperiam voluptatum.
+                            Kindly remember your password as it can only be changed after logining in.
                         </p>
 
                         <form onSubmit={handleSubmit} className="mt-8 grid grid-cols-6 gap-6">

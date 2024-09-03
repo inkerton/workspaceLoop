@@ -15,8 +15,7 @@ function Hero() {
             </h1>
 
             <p className="mx-auto mt-4 max-w-xl sm:text-xl/relaxed text-black">
-                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nesciunt illo tenetur fuga ducimus
-                numquam ea!
+                Keeping track of all incidents and creating new incidents has gotten a lot more easier with WorkspaceLoop.
             </p>
 
             <div className="mt-8 flex flex-wrap justify-center gap-4">

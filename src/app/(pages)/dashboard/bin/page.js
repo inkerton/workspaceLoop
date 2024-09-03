@@ -45,7 +45,7 @@ function BinPage() {
 
         <Typography className="flex ">
             <FileWarning/> The bin contains info. of deleted incidents along with deleted on and deleted by fields. 
-            The incidents can not be moved back ,once added to bin.
+            The incidents can be restored back ,once added to bin.
         </Typography>
       </div>
 

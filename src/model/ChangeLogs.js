@@ -10,9 +10,13 @@ const changeLogSchema = new mongoose.Schema({
         required: true,
     },    
     timeOfAction: {
+        type: Date,
+        required: true,
+    },
+    incidentNo: {
         type: String,
         required: true,
-    }   
+    },
 }, {timestamps: true})
 
 const ChangeLog = mongoose.models.ChangeLog || mongoose.model("ChangeLog",changeLogSchema)

@@ -30,8 +30,9 @@ export async function POST(request) {
 
       const changeLog = new ChangeLog({
         username: comment.username,
-        action: `New Comment Posted`,
+        action: `New Comment Posted to ${incidentNo}`,
         timeOfAction: comment.date,
+        incidentNo: incidentNo,
       });
 
       await changeLog.save();
@@ -51,8 +52,9 @@ export async function POST(request) {
 
       const changeLog = new ChangeLog({
         username: comment.username,
-        action: `New Comment Pushed to an Existing one`,
+        action: `New Comment Pushed to Existing ${incidentNo}`,
         timeOfAction: comment.date,
+        incidentNo: incidentNo,
       });
 
       await changeLog.save();

@@ -146,6 +146,7 @@ export async function POST(req) {
       username,
       action: `Added incident info of ${incidentNo}`,
       timeOfAction,
+      incidentNo: incidentNo,
     });
 
     await changeLog.save();

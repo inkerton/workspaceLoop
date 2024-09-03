@@ -89,6 +89,7 @@ export async function PUT(request) {
       username,
       action: `Edited incident:- ${incidentNo} `,
       timeOfAction,
+      incidentNo: incidentNo,
     });
 
     await changeLog.save();

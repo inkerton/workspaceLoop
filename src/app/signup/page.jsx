@@ -88,8 +88,7 @@ function SignUp() {
                         </h1>
 
                         <p className="mt-4 leading-relaxed text-gray-500">
-                            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Eligendi nam dolorum aliquam,
-                            quibusdam aperiam voluptatum.
+                            Kindly keep your username as ' FirstName.LastName '. The username need to be unique. If already present use ( _ or - ) instead of dot.
                         </p>
 
                         <form onSubmit={handleSubmit} className="mt-8 grid grid-cols-6 gap-6">

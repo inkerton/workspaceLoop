@@ -33,6 +33,7 @@ const commentSchema = new mongoose.Schema({
         {
           text: { type: String, required: false },
           dateOfReply: { type: Date, required: false },
+          username: { type: String, required: false },
         },
       ],
       date: { type: Date, required: true },

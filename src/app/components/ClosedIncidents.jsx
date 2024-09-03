@@ -155,7 +155,7 @@ function ClosedIncidents({ data, username }) {
 
     muiPaginationProps: {
       color: "secondary",
-      rowsPerPageOptions: [10, 20, 30, 50, 100],
+      rowsPerPageOptions: [10, 20, 30, 50, 100, 250, 500],
       shape: "rounded",
       variant: "outlined",
     },
@@ -165,8 +165,8 @@ function ClosedIncidents({ data, username }) {
           alignItems: "center",
           display: "flex",
           justifyContent: "space-around",
-          left: "30px",
-          maxWidth: "1000px",
+          // left: "30px",
+          maxWidth: "1400px",
           position: "sticky",
           width: "100%",
         }}

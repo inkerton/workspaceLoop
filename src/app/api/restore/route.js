@@ -34,6 +34,7 @@ export async function POST(request){
             username: username,
             action: `Restored ${incidentNo} from bin`,
             timeOfAction: restoredOn,
+            incidentNo: incidentNo,
         });
 
         console.log('object change log', changeLog);

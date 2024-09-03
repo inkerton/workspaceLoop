@@ -38,6 +38,7 @@ export async function POST(request){
             username: deletedBy,
             action: `Moved ${incidentNo} to bin`,
             timeOfAction: deletedOn,
+            incidentNo: incidentNo,
         });
 
         console.log('object change log', changeLog);
