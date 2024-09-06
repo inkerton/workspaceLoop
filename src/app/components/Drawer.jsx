@@ -99,24 +99,7 @@ const router = useRouter();
     handleGetComments();
   }, [open]);
 
-  const handleReplyAction = async (commentId, reply) => {
-    const replyPayload = {
-      userId: id, // ID of the user replying
-      comId: commentId, // ID of the comment being replied to
-      text: reply, // Text of the reply
-      dateOfReply: new Date().toISOString(), // Current date and time
-      username: username, // Current username
-    };
-
-    console.log("Reply payload", replyPayload);
-
-    try {
-      const response = await axios.post("/api/reply", replyPayload);
-      console.log("Reply posted successfully:", response.data);
-    } catch (error) {
-      console.error("Error posting reply:", error);
-    }
-  };
+  
 
   return (
     <Drawer anchor="right" open={open} onClose={onClose}>
@@ -150,10 +133,9 @@ const router = useRouter();
             color: "white",
             padding: "7px 15px",
           }}
-          // replyInputStyle={{ borderBottom: "1px solid black", color: "black" }}
-          replyInputStyle={{ display: "none" }} 
+          replyInputStyle={{ borderBottom: "1px solid black", color: "black" }}
+          // replyInputStyle={{ display: "none" }} 
           onSubmitAction={handleCommentSubmit}
-          // onReplyAction={(commentId, reply) => handleReplyAction(commentId, reply)}
           onReplyAction={handleCommentSubmit}
         />
       </Box>

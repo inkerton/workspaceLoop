@@ -122,11 +122,6 @@ export async function POST(req) {
     const logCollectionDetails = formData.get("logCollectionDetails");
     console.log("log collection detals: ", logCollectionDetails);
 
-    // Prepare PDF data for storage
-    const pdfData = allpdf.map((file) => ({
-      filename: file.originalname,
-      data: file.buffer, // Store file buffer directly
-    }));
 
     // Create new IncidentInfo document
     const newInfo = new IncidentInfo({
@@ -137,7 +132,6 @@ export async function POST(req) {
       artifacts,
       miscellaneousInfo,
       TTPDetails: TTPDetails,
-      pdfFiles: pdfData, // Store buffers in MongoDB
     });
 
     await newInfo.save();

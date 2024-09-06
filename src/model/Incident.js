@@ -32,13 +32,6 @@ const IncidentSchema = new mongoose.Schema({
         type: [{ value: String, info: String }],
         required: false,
     },
-    pdfFiles: [
-        {
-            filename: String,
-            fileId: mongoose.Schema.Types.ObjectId,
-            data: Buffer,
-        },
-    ],
 }, { timestamps: true });
 
 const IncidentInfo = mongoose.models.IncidentInfo || mongoose.model('IncidentInfo', IncidentSchema);

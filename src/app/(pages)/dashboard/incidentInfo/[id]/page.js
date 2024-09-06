@@ -32,6 +32,7 @@ import "@toast-ui/editor/dist/toastui-editor.css";
 import { Editor } from "@toast-ui/react-editor";
 import { toast } from "react-toastify";
 import Cookies from "js-cookie";
+import FileUploadComponent from "@/app/components/UploadFile";
 
 function page({ params }) {
   const router = useRouter();
@@ -50,7 +51,6 @@ function page({ params }) {
   const [logCollectionDetails, setLogCollectionDetails] = useState("");
   const [artifacts, setArtifacts] = useState("");
   const [miscellaneousInfo, setMiscellaneousInfo] = useState("");
-  const [pdfFiles, setPdfFiles] = useState([]);
   const [finalReport, setFinalReport] = useState(null);
 
   const [selectedLogOption, setSelectedLogOption] = useState("");
@@ -128,9 +128,7 @@ function page({ params }) {
     setTTPDetails(selectedTTPs);
   };
 
-  const handleFileChange = (event) => {
-    setPdfFiles(Array.from(event.target.files));
-  };
+
 
   const handlesingleFileChange = (event) => {
     setFinalReport(event.target.files);
@@ -155,14 +153,7 @@ function page({ params }) {
     formData.append("artifacts", artifacts);
     formData.append("miscellaneousInfo", miscellaneousInfo);
     formData.append("TTPDetails", JSON.stringify(TTPDetails));
-    const allpdf = [];
 
-    pdfFiles.forEach((file, index) => {
-      allpdf.push({ [`pdfFiles[${index}]`]: file });
-      console.log("ffiillee", file);
-    });
-    formData.append("allpdf", allpdf);
-    console.log("json pdf", allpdf);
 
     for (const [key, value] of formData.entries()) {
       console.log(`Key: ${key}, Value: ${value}`);
@@ -587,20 +578,7 @@ function page({ params }) {
                         </Grid>
 
                         <Grid item xs={9}>
-                          <input
-                            type="file"
-                            accept=".pdf, .docx"
-                            multiple
-                            onChange={handleFileChange}
-                            style={{
-                              marginBottom: "1rem",
-                            }}
-                          />
-                          <List>
-                            {pdfFiles.map((file, index) => (
-                              <ListItem key={index}>{file.name}</ListItem>
-                            ))}
-                          </List>
+                        <FileUploadComponent incidentNo={incidentNo} />
                         </Grid>
                       </Box>
                     </Grid>
