@@ -8,6 +8,9 @@ import '@toast-ui/editor/dist/toastui-editor.css';
 import { useRouter } from 'next/navigation';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import axios from 'axios';
+import dayjs from 'dayjs';
+import { toast } from 'react-toastify';
+import DrawerComponent from '@/app/components/Drawer';
 
 
 
@@ -16,10 +19,27 @@ function ViewIncident({ params }) {
     console.log(currentID);
     const router = useRouter();
     const [incidentData, setIncidentData] = useState([]);
+    const [incidentInfo, setIncidentInfo] = useState(null);
     const [assignedTo, setAssignedTo] = useState([]);
     const [incidentNo, setIncidentNo] = useState('');
     const [assignedToOptions, setAssignedToOptions] = useState([]);
-    const formattedDate = new Date(incidentData.dateOfInput).toLocaleString();
+    // const formattedDate = new Date(incidentData.dateOfInput).toLocaleString();
+    const formattedDate = dayjs(incidentData.dateOfInput).format('DD-MMM-YYYY');
+    const [selectedLogOption, setSelectedLogOption] = useState("");
+    const handleLogOptionChange = (event) => {
+        setSelectedLogOption(event.target.value);
+      };
+    const editorRef = React.createRef(null);
+
+    const [drawerOpen, setDrawerOpen] = useState(false);
+
+    const handleDrawerOpen = () => {
+        setDrawerOpen(true);
+    };
+
+    const handleDrawerClose = () => {
+        setDrawerOpen(false);
+    };
 
     const statusMapping = {
         ASSIGNED: "Assigned",
@@ -33,16 +53,14 @@ function ViewIncident({ params }) {
 
       const getUsers = async ()=>{
         try {
-          const response = await axios.get('/api/auth');
+          const response = await axios.get('/api/register');
           const data = response.data.data;
           console.log(data);
           if(response.status == 200){
-            const userOptions = data.map(user => user.username);
-            console.log(userOptions);
-            setAssignedToOptions(userOptions);
-            alert("data fetched successfully");
+            setAssignedToOptions(data);
+            toast.success("data fetched successfully");
           } else {
-            alert("could not get document count");
+            toast.error("could not get document count");
           }
     
         } catch(error) {
@@ -59,10 +77,19 @@ function ViewIncident({ params }) {
             setIncidentData(data);
             setAssignedTo(data.assignedTo);
             setIncidentNo(data.incidentNo);
+
+            if (response.data.additionalInfo) {
+                const additionalInfo = response.data.additionalInfo;
+                console.log('additionalInfo', additionalInfo);
+                // setIncidentInfo(additionalInfo);
+                setIncidentInfo(response.data.additionalInfo || null);
+                // setAdditionalInfo(additionalInfo);
+                // handleTTPDetails(additionalInfo.TTPDetails);
+                // setEntryPointOfContactName(additionalInfo.entryPointOfContactName);
+            }
             
             if (response.status == 200) {
-                // return alert('fetched successfully');
-                console.log('success');
+                return toast.success('fetched successfully');
             } else {
                 console.log('something went wrong')
             }
@@ -174,7 +201,7 @@ function ViewIncident({ params }) {
 
                         <div>
                             <section>
-                                <div className='p-4'>
+                                <div className='p-6'>
                                     <Grid container spacing={2}>
                                     <Grid item xs={12}>
                                         <Box className="flex" sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
@@ -324,7 +351,222 @@ function ViewIncident({ params }) {
                                         </Grid>
 
                                         </Box>
+                                        <div className='flex justify-end flex-end'>
+                                            <Button 
+                                            variant="contained" 
+                                            color="primary" 
+                                            sx={{
+                                                backgroundColor: '#12a1c0', 
+                                                color: '#fff',
+                                                '&:hover': {
+                                                backgroundColor: '#0F839D',
+                                                }, 
+                                            }}
+                                            onClick={handleDrawerOpen}>
+                                                Open Comments Section
+                                            </Button>
+                                        </div>
+
+                                        <DrawerComponent incidentNo={currentID} open={drawerOpen} onClose={handleDrawerClose} />
                                     </Grid>
+
+                                {incidentInfo !== null && (
+                                <>
+
+                                     {/* Grid item for TTP Details  */}
+                                     {incidentInfo.TTPDetails && incidentInfo.TTPDetails.length > 0 ? (
+                                        <Grid item xs={12}>
+                                            <Box
+                                            sx={{
+                                                display: "flex",
+                                                alignItems: "center",
+                                                gap: 2,
+                                                mb: 2,
+                                            }}
+                                            >
+                                            <Grid item xs={3}>
+                                                <Typography variant="h6">TTP Details:</Typography>
+                                            </Grid>
+                                            <Grid item xs={9}>
+                                            <Autocomplete
+                                                multiple
+                                                fullWidth
+                                                options={incidentInfo.TTPDetails.map(ttp => `${ttp.value} - ${ttp.info}`)}
+                                                getOptionLabel={(option) => option}
+                                                value={incidentInfo.TTPDetails.map(ttp => `${ttp.value} - ${ttp.info}`)}
+                                                sx={{ flexGrow: 1, backgroundColor: 'white'}}
+                                                renderTags={(value, getTagProps) =>
+                                                    value.map((option, index) => (
+                                                        <Chip variant="outlined" label={option} {...getTagProps({ index })} />
+                                                    ))
+                                                }
+                                                renderInput={(params) => (
+                                                    <TextField
+                                                        {...params}
+                                                        variant="outlined"
+                                                        label="TTP Details"
+                                                        placeholder="Selected TTP details"
+                                                        fullWidth
+                                                        sx={{ flexGrow: 1, backgroundColor: 'white' }}
+                                                    />
+                                                )}
+                                            />
+                                            </Grid>
+                                            {/* <Grid item xs={9}>
+                                                {incidentInfo.TTPDetails.map((ttp, index) => (
+                                                <Chip
+                                                    key={index}
+                                                    label={`${ttp.value} - ${ttp.info}`}
+                                                    variant="outlined"
+                                                    sx={{ mb: 1, mr: 1 }} // Adding margin bottom and right for spacing
+                                                />
+                                                ))}
+                                            </Grid> */}
+                                            </Box>
+                                        </Grid>
+                                    ) : null}
+
+                                    {/* Grid item for Artifacts  */}
+                                    {incidentInfo.artifacts && (
+                                    <Grid item xs={12}>
+                                        <Box className="flex" sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+
+                                        <Grid item xs={3}>
+                                        <Typography variant="h6" >
+                                        Artifacts:
+                                        <Tooltip title="Read only">
+                                            <InfoIcon fontSize="small" color="disabled" /> {/* sx={{ verticalAlign: 'super' }} to mamke it superscript */}
+                                        </Tooltip>
+                                        </Typography>
+                                        </Grid>
+                                        <Grid item xs={9}>
+
+                                        <TextareaAutosize
+                                        style={{ width: '100%', border: '1px solid lightgray', borderRadius: '4px', padding: '8px', }}
+                                        value={incidentInfo.artifacts}
+                                        readOnly
+                                        />
+                                        </Grid>
+
+                                        </Box>
+                                    </Grid>
+                                    )}
+
+                                    {/* Grid item for Miscellaneous Info */}
+                                    {incidentInfo.miscellaneousInfo && (
+                                        <Grid item xs={12}>
+                                            <Box className="flex" sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                                                <Grid item xs={3}>
+                                                    <Typography variant="h6">
+                                                        Miscellaneous Info:
+                                                        <Tooltip title="Read only">
+                                                            <InfoIcon fontSize="small" color="disabled" /> {/* sx={{ verticalAlign: 'super' }} to make it superscript */}
+                                                        </Tooltip>
+                                                    </Typography>
+                                                </Grid>
+                                                <Grid item xs={9}>
+                                                    <TextareaAutosize
+                                                        style={{ width: '100%', border: '1px solid lightgray', borderRadius: '4px', padding: '8px' }}
+                                                        value={incidentInfo.miscellaneousInfo || ''}
+                                                        readOnly
+                                                    />
+                                                </Grid>
+                                            </Box>
+                                        </Grid>
+                                    )}
+
+                                    {/* Grid item for entryPointOfContact  */}
+                                    {incidentInfo.entryPointOfContactName && (
+                                        <Grid item xs={12}>
+                                            <Box className="flex" sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                                                <Grid item xs={3}>
+                                                    <Typography variant="h6">
+                                                        Entity Point of Contact:
+                                                        <Tooltip title="Read only">
+                                                            <InfoIcon fontSize="small" color="disabled" /> {/* sx={{ verticalAlign: 'super' }} to make it superscript */}
+                                                        </Tooltip>
+                                                    </Typography>
+                                                </Grid>
+                                                <Grid item xs={5}>
+                                                    <TextareaAutosize
+                                                        label='Name'
+                                                        style={{ width: '100%', border: '1px solid lightgray', borderRadius: '4px', padding: '8px' }}
+                                                        value={incidentInfo.entryPointOfContactName || ''}
+                                                        readOnly
+                                                        />
+                                                </Grid>
+                                                <Grid item xs={4}>
+                                                    <TextareaAutosize
+                                                        style={{ width: '100%', border: '1px solid lightgray', borderRadius: '4px', padding: '8px' }}
+                                                        value={incidentInfo.entryPointOfContactNumber || ''}
+                                                        readOnly
+                                                    />
+                                                </Grid>
+                                            </Box>
+                                        </Grid>
+                                    )}
+
+                                   {/* Grid item for Log Collection Details */}
+                                   {incidentInfo.logCollectionDetails && (
+                                    <Grid item xs={12}>
+                                    <Box
+                                      className="flex"
+                                      sx={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: 2,
+                                        mb: 2,
+                                      }}
+                                    >
+                                      <Grid item xs={3}>
+                                        <Typography variant="h6">
+                                          Log Collection Details:
+                                        </Typography>
+                                      </Grid>
+              
+                                      <Grid item xs={9}>
+                                        <FormControl component="fieldset">
+                                          <RadioGroup
+                                            row
+                                            value={selectedLogOption}
+                                            onChange={handleLogOptionChange}
+                                          >
+                                            <FormControlLabel
+                                              value="editor"
+                                              control={<Radio />}
+                                              label="Editor"
+                                            />
+                                          </RadioGroup>
+                                        </FormControl>
+              
+                                        {selectedLogOption === "editor" && (
+                                          <Editor
+                                            //   initialValue="These are the formats for all! Add image like this:- ![image](https://uicdn.toast.com/toastui/img/tui-editor-bi.png) In WYSIWYG, right click on the table for more options... For more information visit [Editor](https://github.com/nhn/tui.editor). "
+                                            previewStyle="vertical"
+                                            height="600px"
+                                            initialEditType="wysiwyg"
+                                            useCommandShortcut={true}
+                                            ref={editorRef}
+                                            initialValue={incidentInfo.logCollectionDetails}
+                                            // onChange={() => {
+                                            //     if (editorRef.current) {
+                                            //         const editorInstance = editorRef.current.getInstance();
+                                            //         setLogCollectionDetails(editorInstance.getMarkdown());
+                                            //     }
+                                            // }}
+                                              
+                                          />
+                                        )}
+                                      </Grid>
+                                    </Box>
+                                  </Grid>
+                                   )}
+
+
+                                </>
+                                )}
+
+                                    
 
                                     
 
@@ -341,6 +583,13 @@ function ViewIncident({ params }) {
                         <Button 
                         variant="contained" 
                         color="primary" 
+                        sx={{
+                            backgroundColor: '#12a1c0', 
+                            color: '#fff',
+                            '&:hover': {
+                            backgroundColor: '#0F839D',
+                            }, 
+                        }}
                         onClick={() => router.push('/dashboard')} 
                         startIcon={<ArrowBackIcon />}
                         >

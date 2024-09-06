@@ -9,6 +9,7 @@ function SignUp() {
     const [username,setUsername] = useState("");
     const [password,setPassword] = useState("");
     const [email, setEmail] = useState('');
+    const [role, setRole] = useState('User');
 
     const [formData, setFormData] = useState({
         password: '',
@@ -38,21 +39,21 @@ function SignUp() {
         } else {
             setPassword(passwordConfirmation);
         }
-        console.log("user:", username, "pass:", password, "email: ", email);
+        console.log("user:", username, "pass:", password, "email: ", email, "role", role);
         try{
             // Submit form data
-            const response = await axios.post('api/auth', {
-                action: 'register',
+            const response = await axios.post('api/register', {
                 username,
                 password,
-                email
+                email,
+                role
             }, {
                 headers: {
                     'Content-Type': 'application/json'
                 }
             });  
     
-
+            
             console.log(response.data);
             if(response.status == 201){
                 router.push('/signin');
@@ -87,8 +88,7 @@ function SignUp() {
                         </h1>
 
                         <p className="mt-4 leading-relaxed text-gray-500">
-                            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Eligendi nam dolorum aliquam,
-                            quibusdam aperiam voluptatum.
+                            Kindly keep your username as ' FirstName.LastName '. The username need to be unique. If already present use ( _ or - ) instead of dot.
                         </p>
 
                         <form onSubmit={handleSubmit} className="mt-8 grid grid-cols-6 gap-6">

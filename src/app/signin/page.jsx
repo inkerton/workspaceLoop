@@ -1,7 +1,8 @@
 'use client'
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useRouter } from 'next/navigation'; // Import useRouter from next/navigation
+import { useRouter } from 'next/navigation'; 
+import { signIn } from 'next-auth/react';
 
 function SignIn() {
     const [username, setUsername] = useState("");
@@ -13,29 +14,44 @@ function SignIn() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         console.log("user:", username, "pass:", password);
-
-        try {
-          // Check if the user exists
-          const response = await axios.post('api/auth', {
-              action: 'login',
-              username,
-              password
-          }, {
-              headers: {
-                  'Content-Type': 'application/json'
-              }
-          });        
         
-        if (response.status === 200 && response.data.exists) {
-                  alert("Logged in successfully");
-                  router.push('/dashboard'); 
-          } else {
-              alert("User not found");
-          }
-      } catch (error) {
-          console.error("An error occurred:", error);
-          alert("User not found");
-      }
+        try {
+
+            const res = await signIn("credentials", {
+                username: username,
+                password: password,
+                redirect: false
+            })
+
+            if(res.error) {
+                alert("Invalid credentials");
+                return;
+            }
+            router.replace("/dashboard");
+          // Check if the user exists
+        //   const response = await axios.post('api/auth', {
+        //       username,
+        //       password
+        //   }, {
+        //       headers: {
+        //           'Content-Type': 'application/json'
+        //       }
+        //   });        
+        //   console.log('response', response)
+        
+        // if (response.status === 200 ) {
+        //           alert("Logged in successfully");
+        //           router.push('/dashboard'); 
+        //   } else {
+        //       alert("User not found inside");
+        //   }
+      } 
+    //   catch (error) {
+    //       console.error("An error occurred:", error);
+    //   }
+    finally {
+        console.log('object')
+    }
     };
 
     return (
@@ -56,8 +72,7 @@ function SignIn() {
                         </h1>
 
                         <p className="mt-4 leading-relaxed text-gray-500">
-                            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Eligendi nam dolorum aliquam,
-                            quibusdam aperiam voluptatum.
+                            Kindly remember your password as it can only be changed after logining in.
                         </p>
 
                         <form onSubmit={handleSubmit} className="mt-8 grid grid-cols-6 gap-6">

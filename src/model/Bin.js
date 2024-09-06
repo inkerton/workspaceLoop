@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const newIncidentSchema = new mongoose.Schema({
+const binSchema = new mongoose.Schema({
     incidentNo: {
         type: String,
         required: true,
@@ -42,8 +42,16 @@ const newIncidentSchema = new mongoose.Schema({
         type: String,
         required: false,
     },    
+    deletedBy: {
+        type: String,
+        required: false,
+    },    
+    deletedOn: {
+        type: Date,
+        required: false,
+    },    
 }, {timestamps: true})
 
-const NewIncident = mongoose.models.NewIncident || mongoose.model("NewIncident",newIncidentSchema)
+const BinIncident = mongoose.models.BinIncident || mongoose.model("BinIncident",binSchema)
 
-export default NewIncident;
+export default BinIncident;

@@ -7,14 +7,17 @@ const userSchema = new mongoose.Schema({
         unique: true,
     },
     password: {
-        type: String,
-        // type: Buffer,
+        type: Buffer,
         required: true,
     },    
     email: {
         type: String,
         required: false,
-    }    
+    },
+    role: {
+        type: String,
+        required: true,
+    },    
 }, {timestamps: true})
 
 const User = mongoose.models.User || mongoose.model("User",userSchema)
