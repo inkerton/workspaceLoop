@@ -179,7 +179,7 @@ function SearchedIncidents({ data }) {
           console.log("Incident ID:", incId); // Log the incident ID
           // setIncidentNo(incId);
           if (incId) {
-            router.push(`dashboard/viewIncident/${incId}`);
+            router.replace(`/dashboard/viewIncident/${incId}`);
           } else {
             console.error("Incident ID is undefined");
           }

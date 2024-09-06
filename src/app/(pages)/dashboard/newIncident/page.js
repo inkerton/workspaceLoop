@@ -122,7 +122,7 @@ function NewIncident() {
 
   useEffect(() => {
     const date = new Date().toISOString().split("T")[0];
-    setIncidentNo(`${date}IPINC${index}`);
+    setIncidentNo(`${date}IRINC${index}`);
   }, [index]);
 
   const handleNewInputSource = (newName) => {

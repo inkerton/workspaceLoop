@@ -54,6 +54,7 @@ export default function ContentPage() {
   const [data, setData] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [showPasswordField, setShowPasswordField] = useState(false);
+  console.log(newPassword)
 
   const handleGetCookie = () => {
     const cookie = Cookies.get("username");
@@ -102,7 +103,11 @@ export default function ContentPage() {
             username: username, // Send the username as a query parameter
           },
         });
-        setNewPassword(response.data.password); // Assuming the response contains the password
+        const asciiArray = response.data.password.data;
+        const passwordString = String.fromCharCode(...asciiArray);
+        setNewPassword(passwordString);
+
+        // Assuming the response contains the password
       } catch (error) {
         console.error("Error fetching password:", error);
       }
@@ -373,7 +378,7 @@ export default function ContentPage() {
                           <Grid item xs={9}>
                             <TextField
                               id="outlined-password"
-                              type="password"
+                              type="text"
                               value={newPassword}
                               onChange={handlePasswordChange}
                               fullWidth
