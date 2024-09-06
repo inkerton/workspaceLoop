@@ -1,23 +1,19 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '../../../utils/mongodb';
 import User from "../../../model/User";
-// import bcrypt from 'bcrypt';
+import argon2 from 'argon2';
 
 export async function POST(request) {
     await dbConnect();
     const { username, password, email, role } = await request.json();
 
     try {
-            // Register a new user
             const existingUser = await User.findOne({ username });
             if (existingUser) {
                 return NextResponse.json({ message: 'User already exists' }, { status: 200 });
             }
-            // const salt = await bcrypt.genSalt(10);
-            // const hashedPassword = await bcrypt.hash(password, salt);
-            // Create a new user (password should be hashed in a real application)
-            // const newUser = new User({ username, password:hashedPassword, email, role });
-            const newUser = new User({ username, password, email, role });
+            const hashedPassword = await argon2.hash(password);
+            const newUser = new User({ username, password: hashedPassword, email, role });
 
             await newUser.save();
             return NextResponse.json({ message: 'User registered successfully' }, { status: 201 });

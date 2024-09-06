@@ -96,22 +96,22 @@ export default function ContentPage() {
 
   const handleClickHere = async () => {
     setShowPasswordField(!showPasswordField);
-    if (!showPasswordField) {
-      try {
-        const response = await axios.get("/api/profile",{
-          params: {
-            username: username, // Send the username as a query parameter
-          },
-        });
-        const asciiArray = response.data.password.data;
-        const passwordString = String.fromCharCode(...asciiArray);
-        setNewPassword(passwordString);
+    // if (!showPasswordField) {
+    //   try {
+    //     const response = await axios.get("/api/profile",{
+    //       params: {
+    //         username: username, // Send the username as a query parameter
+    //       },
+    //     });
+    //     const asciiArray = response.data.password.data;
+    //     const passwordString = String.fromCharCode(...asciiArray);
+    //     setNewPassword(passwordString);
 
-        // Assuming the response contains the password
-      } catch (error) {
-        console.error("Error fetching password:", error);
-      }
-    }
+    //     // Assuming the response contains the password
+    //   } catch (error) {
+    //     console.error("Error fetching password:", error);
+    //   }
+    // }
   };
 
   // Handle password change request
@@ -290,10 +290,10 @@ export default function ContentPage() {
             </Typography>
             <Divider />
             <div className="w-full">
-              <Card sx={{ boxShadow: "sm" }} className="shadow-md">
+              <Card sx={{ boxShadow: "sm", maxWidth: 1000, width: '100%', margin: 'auto' }} className="shadow-md">
                 <CardContent>
                   <Grid container spacing={2}>
-                    <Grid item xs={12}>
+                    <Grid item xs={10}>
                       <Box
                         className="flex"
                         sx={{
@@ -306,7 +306,7 @@ export default function ContentPage() {
                         <Grid item xs={3}>
                           <Typography variant="h6">Username:</Typography>
                         </Grid>
-                        <Grid item xs={9}>
+                        <Grid item xs={7}>
                           <TextField
                             id="outlined-username"
                             defaultValue="NCIIPC"
@@ -319,7 +319,7 @@ export default function ContentPage() {
                         </Grid>
                       </Box>
                     </Grid>
-                    <Grid item xs={12}>
+                    <Grid item xs={10}>
                       <Box
                         className="flex"
                         sx={{
@@ -332,7 +332,7 @@ export default function ContentPage() {
                         <Grid item xs={3}>
                           <Typography variant="h6">Email:</Typography>
                         </Grid>
-                        <Grid item xs={9}>
+                        <Grid item xs={7}>
                           <TextField
                             id="outlined-email"
                             defaultValue="example@example.com"
@@ -346,7 +346,7 @@ export default function ContentPage() {
                       </Box>
                     </Grid>
                     
-                    <Grid item xs={12}>
+                    <Grid item xs={10}>
                       <Typography variant="h7" className="p-2">
                         Want to change password?{" "}
                         <span
@@ -362,7 +362,7 @@ export default function ContentPage() {
                       </Typography>
                     </Grid>
                     {showPasswordField && (
-                      <Grid item xs={12}>
+                      <Grid item xs={10}>
                         <Box
                           className="flex"
                           sx={{
@@ -375,7 +375,7 @@ export default function ContentPage() {
                           <Grid item xs={3}>
                             <Typography variant="h6">New Password:</Typography>
                           </Grid>
-                          <Grid item xs={9}>
+                          <Grid item xs={7}>
                             <TextField
                               id="outlined-password"
                               type="text"
@@ -388,6 +388,7 @@ export default function ContentPage() {
                       </Grid>
                     )}
                   </Grid>
+                  {showPasswordField && (
                   <div className="flex justify-end mr-4">
                     <Button
                       type="submit"
@@ -408,6 +409,7 @@ export default function ContentPage() {
                       Change password
                     </Button>
                   </div>
+                  )}
                 </CardContent>
               </Card>
               <div className="flex justify-end">

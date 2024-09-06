@@ -7,9 +7,10 @@ import Cookies from "js-cookie";
 import axios from "axios";
 import { Button } from "@mui/material";
 import { useRouter } from "next/navigation";
+import DOMPurify from "dompurify";
 
 export default function DrawerComponent({ incidentNo, open, onClose }) {
-const router = useRouter();
+  const router = useRouter();
   const currentID = router.pathname;
   const [data, setData] = useState([]);
   const [username, setUsername] = useState("N");
@@ -54,6 +55,12 @@ const router = useRouter();
     }
   };
 
+  const MyComponent = ({ htmlContent }) => (
+    <div
+      dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(htmlContent) }}
+    />
+  );
+
   const handleGetComments = async () => {
     try {
       const response = await axios.get(
@@ -75,21 +82,23 @@ const router = useRouter();
       setId(result._id);
 
       const transformData = (result) => {
-        return result.comments.map(comment => ({
-          userId: result._id, // assuming userId maps to _id of the result
+        return result.comments.map((comment) => ({
+          userId: result._id, 
           comId: comment._id,
           fullName: comment.username,
-          userProfile: '/dashboard/profile', // static route as per requirement
-          text: comment.text,
-          avatarUrl: 'https://ui-avatars.com/api/name=' + encodeURIComponent(comment.username) + '&background=random', // generating avatar URL dynamically
-          replies: []
+          userProfile: "/dashboard/profile", 
+          text: DOMPurify.sanitize(comment.text),
+          avatarUrl:
+            "https://ui-avatars.com/api/name=" +
+            encodeURIComponent(comment.username) +
+            "&background=random", 
+          replies: [],
         }));
       };
 
       const transformedData = transformData(result);
-        console.log('transformed',transformedData);
-        setData(transformedData);
-
+      console.log("transformed", transformedData);
+      setData(transformedData);
     } catch (error) {
       console.error("Error fetching comments:", error);
     }
@@ -98,8 +107,6 @@ const router = useRouter();
   useEffect(() => {
     handleGetComments();
   }, [open]);
-
-  
 
   return (
     <Drawer anchor="right" open={open} onClose={onClose}>
@@ -134,7 +141,7 @@ const router = useRouter();
             padding: "7px 15px",
           }}
           replyInputStyle={{ borderBottom: "1px solid black", color: "black" }}
-          // replyInputStyle={{ display: "none" }} 
+          // replyInputStyle={{ display: "none" }}
           onSubmitAction={handleCommentSubmit}
           onReplyAction={handleCommentSubmit}
         />

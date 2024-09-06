@@ -1,34 +1,33 @@
 import User from "@/model/User";
 import dbConnect from "@/utils/mongodb";
 import { NextResponse } from "next/server";
-import bcrypt from 'bcrypt';
+import argon2 from "argon2";
 
-export async function GET(request) {
-  dbConnect();
-  try {
-    console.log("object");
-    const { searchParams } = request.nextUrl;
-    const username = searchParams.get("username");
-    console.log(username);
+// export async function GET(request) {
+//   dbConnect();
+//   try {
+//     console.log("object");
+//     const { searchParams } = request.nextUrl;
+//     const username = searchParams.get("username");
+//     console.log(username);
 
-    const user = await User.findOne({ username });
-    console.log(user);
+//     const user = await User.findOne({ username });
+//     console.log(user);
 
-    const { password } = user;
+//     const { password } = user;
 
-    return NextResponse.json({ password }, { status: 200 });
-  } catch (error) {
-    return NextResponse.json(
-      { message: "Error while getting password" },
-      { status: 500 }
-    );
-  }
-}
+//     return NextResponse.json({ password }, { status: 200 });
+//   } catch (error) {
+//     return NextResponse.json(
+//       { message: "Error while getting password" },
+//       { status: 500 }
+//     );
+//   }
+// }
 
 export async function POST(request) {
   dbConnect();
   try {
-    console.log("object inside post pass try");
     const body = await request.json();
     const { username, newPassword } = body;
     console.log("object of newpassword", newPassword);
@@ -36,10 +35,9 @@ export async function POST(request) {
     const user = await User.findOne({ username });
     console.log(user);
 
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(newPassword, salt);
+    const hashedNewPassword = await argon2.hash(newPassword);
 
-    user.password = hashedPassword;
+    user.password = hashedNewPassword;
     await user.save();
     return NextResponse.json(
       { message: "Password updated sucessfully" },
