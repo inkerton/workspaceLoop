@@ -13,6 +13,10 @@ import {
   Chip,
   Grid,
   Divider,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  IconButton,
 } from "@mui/material";
 import Autocomplete, { createFilterOptions } from "@mui/material/Autocomplete";
 
@@ -30,7 +34,9 @@ import allInputSourceOptions from "@/app/components/Options/InputSourceOptions";
 import dayjs from "dayjs";
 import { toast } from "react-toastify";
 import Cookies from "js-cookie";
-
+import { ArrowLeftFromLine } from "lucide-react";
+import { useRouter } from "next/navigation";
+import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
 
 const filter = createFilterOptions();
 
@@ -55,8 +61,9 @@ function getStyles(name, personName, theme) {
 }
 
 function NewIncident() {
-  const theme = useTheme();
+  const router = useRouter();
   const [username, setUsername] = useState("N");
+  const [openModal, setOpenModal] = useState(true);
   const [timeOfAction, setTimeOfAction] = useState("");
   const [incidentNo, setIncidentNo] = useState("");
   const [inputSource, setInputSource] = useState(null);
@@ -120,10 +127,14 @@ function NewIncident() {
     handleGetCookie();
   }, []);
 
-  useEffect(() => {
-    const date = new Date().toISOString().split("T")[0];
-    setIncidentNo(`${date}IRINC${index}`);
-  }, [index]);
+  const handleIncidentTypeSelect = async (type) => {
+    if (type === "internal") {
+      setIncidentNo(`IR_NCIIPC_NTRO_${index}`);
+    } else if (type === "external") {
+      setIncidentNo(`IR_NCIIPC_CII_${index}`);
+    }
+    setOpenModal(false);
+  };
 
   const handleNewInputSource = (newName) => {
     if (!inputSourceOptions.includes(newName)) {
@@ -158,6 +169,13 @@ function NewIncident() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!incidentNo) {
+      return toast.error(
+        "No incident number provided. Please refresh and select the type of incident."
+      );
+    }
+
     try {
       // setTimeOfAction(new Date().toISOString());
 
@@ -184,6 +202,9 @@ function NewIncident() {
         setBrief("");
         setAssignedTo([]);
         setComment("");
+
+        setIncidentNo(""); // Reset incident number
+        setOpenModal(true);
         return toast.success("data stored successfully");
       }
       return toast.error("storage failed");
@@ -195,424 +216,491 @@ function NewIncident() {
   };
 
   return (
-    <div>
-      <Box
-        component="form"
-        onSubmit={handleSubmit}
-        sx={{ p: 2, maxWidth: 1000, mx: "auto" }}
-      >
-        <div className="items-center">
-          <Typography
-            variant="h4"
-            gutterBottom
-            color={"#12a1c0"}
-            sx={{ alignContent: "center", fontWeight: "bold", mb: 2 }}
-          >
-            Incident Form
-          </Typography>
-          <Divider />
-        </div>
-        <Grid container spacing={2}>
-          {/* incident no. */}
-          <Grid item xs={12}>
-            <Box
-              className="flex"
-              sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}
-            >
-              <Grid item xs={3}>
-                <Typography variant="h6">
-                  {" "}
-                  {/* sx={{ whiteSpace: 'nowrap'}} */}
-                  Incident No:
-                </Typography>
-              </Grid>
-              <Grid item xs={9}>
-                <TextField
-                  label="Incident No"
-                  value={incidentNo}
-                  fullWidth
-                  margin="normal"
-                  InputProps={{
-                    readOnly: true,
-                  }}
-                  sx={{ flexGrow: 1 }}
-                />
-              </Grid>
-            </Box>
-          </Grid>
+    <>
+      <div>
+        {/* Modal for incident type selection */}
+        <Dialog open={openModal} onClose={() => setOpenModal(false)}>
+          {/* <DialogTitle>Select Incident Type</DialogTitle> */}
+          <DialogTitle className="flex justify-between">
+            <span style={{ color: "black", fontWeight: "bold"}} className="mt-2">
+              Select Incident Type
+            </span>
 
-          {/* assigned to */}
-          <Grid item xs={12}>
-            <Box
-              className="flex"
-              sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}
+            <IconButton
+              aria-label="back"
+              size="medium"
+              onClick={() => router.push("/dashboard")}
             >
-              <Grid item xs={3}>
-                <Typography variant="h6">Assigned To:</Typography>
-              </Grid>
-              <Grid item xs={9}>
-                <Autocomplete
-                  fullWidth
-                  freeSolo
-                  multiple
-                  options={assignedToOptions}
-                  value={assignedTo}
-                  onInputChange={(event, newValue) => setAssignedTo(newValue)}
-                  onChange={(event, newValue) => {
-                    if (typeof newValue === "string") {
-                      handleNewAssignedTo(newValue);
-                      setAssignedTo([...assignedTo, newValue]);
-                    } else if (newValue && newValue.inputValue) {
-                      handleNewAssignedTo(newValue.inputValue);
-                      setAssignedTo([...assignedTo, newValue.inputValue]);
-                    } else {
-                      setAssignedTo(newValue);
-                    }
-                  }}
-                  filterOptions={(options, params) => {
-                    const filtered = filter(options, params);
-                    const { inputValue } = params;
-                    const isExisting = options.some(
-                      (option) => inputValue === option
-                    );
-                    if (inputValue !== "" && !isExisting) {
-                      filtered.push({
-                        inputValue,
-                        title: `Add "${inputValue}"`,
-                      });
-                    }
-                    return filtered;
-                  }}
-                  selectOnFocus
-                  clearOnBlur
-                  handleHomeEndKeys
-                  getOptionLabel={(option) => {
-                    if (typeof option === "string") {
-                      return option;
-                    }
-                    if (option.inputValue) {
-                      return option.inputValue;
-                    }
-                    return option.title;
-                  }}
-                  renderOption={(props, option) => {
-                    const { key, ...optionProps } = props;
-                    return (
-                      <li key={key} {...optionProps}>
-                        {option.title || option}
-                      </li>
-                    );
-                  }}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label="Assigned To"
-                      margin="normal"
-                      fullWidth
-                      sx={{ flexGrow: 1 }}
-                    />
-                  )}
-                />
-              </Grid>
-            </Box>
-          </Grid>
+              <KeyboardBackspaceIcon fontSize="inherit" />
+            </IconButton>
+          </DialogTitle>
+          <DialogContent>
+            {/* Internal Incident Button */}
+            <Typography className="flex text-gray-500 text-sm">
+              ! Select the type of incident carefully as Incident Number cannot
+              be changed later
+            </Typography>
+            <div className="items-center justify-center">
+              <Button
+                variant="contained"
+                color="primary"
+                sx={{
+                  mt: 2,
+                  mb: 2,
+                  backgroundColor: "#12a1c0",
+                  color: "#fff",
+                  "&:hover": {
+                    backgroundColor: "#0F839D",
+                  },
+                }}
+                onClick={() => handleIncidentTypeSelect("internal")}
+              >
+                Internal Incident
+              </Button>
 
-          {/* input source */}
-          <Grid item xs={12}>
-            <Box
-              className="flex"
-              sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}
+              {/* External Incident Button */}
+              <Button
+                variant="contained"
+                color="primary"
+                sx={{
+                  mt: 2,
+                  mb: 2,
+                  ml: 2,
+                  backgroundColor: "#12a1c0",
+                  color: "#fff",
+                  "&:hover": {
+                    backgroundColor: "#0F839D",
+                  },
+                }}
+                onClick={() => handleIncidentTypeSelect("external")}
+              >
+                External Incident
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+      <div>
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+          sx={{ p: 2, maxWidth: 1000, mx: "auto" }}
+        >
+          <div className="items-center">
+            <Typography
+              variant="h4"
+              gutterBottom
+              color={"#12a1c0"}
+              sx={{ alignContent: "center", fontWeight: "bold", mb: 2 }}
             >
-              <Grid item xs={3}>
-                <Typography variant="h6">Input Source:</Typography>
-              </Grid>
-              <Grid item xs={9}>
-                <Autocomplete
-                  fullWidth
-                  freeSolo
-                  options={inputSourceOptions}
-                  value={inputSource}
-                  onInputChange={(event, newValue) => setInputSource(newValue)}
-                  onChange={(event, newValue) => {
-                    if (typeof newValue === "string") {
-                      handleNewInputSource(newValue);
-                      setInputSource(newValue);
-                    } else if (newValue && newValue.inputValue) {
-                      handleNewInputSource(newValue.inputValue);
-                      setInputSource(newValue.inputValue);
-                    } else {
-                      setInputSource(newValue);
-                    }
-                  }}
-                  filterOptions={(options, params) => {
-                    const filtered = filter(options, params);
-                    const { inputValue } = params;
-                    const isExisting = options.some(
-                      (option) => inputValue === option
-                    );
-                    if (inputValue !== "" && !isExisting) {
-                      filtered.push({
-                        inputValue,
-                        title: `Add "${inputValue}"`,
-                      });
-                    }
-                    return filtered;
-                  }}
-                  selectOnFocus
-                  clearOnBlur
-                  handleHomeEndKeys
-                  getOptionLabel={(option) => {
-                    if (typeof option === "string") {
-                      return option;
-                    }
-                    if (option.inputValue) {
-                      return option.inputValue;
-                    }
-                    return option.title;
-                  }}
-                  renderOption={(props, option) => {
-                    const { key, ...optionProps } = props;
-                    return (
-                      <li key={key} {...optionProps}>
-                        {option.title || option}
-                      </li>
-                    );
-                  }}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label="Input Source"
-                      margin="normal"
-                      fullWidth
-                      sx={{ flexGrow: 1 }}
-                    />
-                  )}
-                />
-              </Grid>
-            </Box>
-          </Grid>
+              Incident Form
+            </Typography>
+            <Divider />
+          </div>
+          <Grid container spacing={2}>
+            {/* incident no. */}
+            <Grid item xs={12}>
+              <Box
+                className="flex"
+                sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}
+              >
+                <Grid item xs={3}>
+                  <Typography variant="h6">
+                    {" "}
+                    {/* sx={{ whiteSpace: 'nowrap'}} */}
+                    Incident No:
+                  </Typography>
+                </Grid>
+                <Grid item xs={9}>
+                  <TextField
+                    label="Incident No"
+                    value={incidentNo}
+                    fullWidth
+                    margin="normal"
+                    InputProps={{
+                      readOnly: true,
+                    }}
+                    sx={{ flexGrow: 1 }}
+                  />
+                </Grid>
+              </Box>
+            </Grid>
 
-          {/* date of input */}
-          <Grid item xs={12}>
-            <Box
-              className="flex"
-              sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}
-            >
-              <Grid item xs={3}>
-                <Typography variant="h6">Date of Input:</Typography>
-              </Grid>
-
-              <Grid item xs={9}>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DatePicker
-                    value={dateOfInput ? dayjs(dateOfInput) : null} // Ensure the date is handled correctly
-                    onChange={(newValue) => {
-                      // Ensure newValue is valid before formatting
-                      if (newValue) {
-                        const formattedDate =
-                          dayjs(newValue).format("YYYY-MM-DD");
-                        setDateOfInput(formattedDate);
+            {/* assigned to */}
+            <Grid item xs={12}>
+              <Box
+                className="flex"
+                sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}
+              >
+                <Grid item xs={3}>
+                  <Typography variant="h6">Assigned To:</Typography>
+                </Grid>
+                <Grid item xs={9}>
+                  <Autocomplete
+                    fullWidth
+                    freeSolo
+                    multiple
+                    options={assignedToOptions}
+                    value={assignedTo}
+                    onInputChange={(event, newValue) => setAssignedTo(newValue)}
+                    onChange={(event, newValue) => {
+                      if (typeof newValue === "string") {
+                        handleNewAssignedTo(newValue);
+                        setAssignedTo([...assignedTo, newValue]);
+                      } else if (newValue && newValue.inputValue) {
+                        handleNewAssignedTo(newValue.inputValue);
+                        setAssignedTo([...assignedTo, newValue.inputValue]);
                       } else {
-                        setDateOfInput(null); // Handle the case where newValue is null
+                        setAssignedTo(newValue);
                       }
                     }}
-                    format="DD/MM/YYYY"
+                    filterOptions={(options, params) => {
+                      const filtered = filter(options, params);
+                      const { inputValue } = params;
+                      const isExisting = options.some(
+                        (option) => inputValue === option
+                      );
+                      if (inputValue !== "" && !isExisting) {
+                        filtered.push({
+                          inputValue,
+                          title: `Add "${inputValue}"`,
+                        });
+                      }
+                      return filtered;
+                    }}
+                    selectOnFocus
+                    clearOnBlur
+                    handleHomeEndKeys
+                    getOptionLabel={(option) => {
+                      if (typeof option === "string") {
+                        return option;
+                      }
+                      if (option.inputValue) {
+                        return option.inputValue;
+                      }
+                      return option.title;
+                    }}
+                    renderOption={(props, option) => {
+                      const { key, ...optionProps } = props;
+                      return (
+                        <li key={key} {...optionProps}>
+                          {option.title || option}
+                        </li>
+                      );
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Assigned To"
+                        margin="normal"
+                        fullWidth
+                        sx={{ flexGrow: 1 }}
+                      />
+                    )}
                   />
-                </LocalizationProvider>
-              </Grid>
-            </Box>
-          </Grid>
+                </Grid>
+              </Box>
+            </Grid>
 
-          {/* Entity Impacted */}
-          <Grid item xs={12}>
-            <Box
-              className="flex"
-              sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}
-            >
-              <Grid item xs={3}>
-                <Typography variant="h6">Entity Impacted:</Typography>
-              </Grid>
+            {/* input source */}
+            <Grid item xs={12}>
+              <Box
+                className="flex"
+                sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}
+              >
+                <Grid item xs={3}>
+                  <Typography variant="h6">Input Source:</Typography>
+                </Grid>
+                <Grid item xs={9}>
+                  <Autocomplete
+                    fullWidth
+                    freeSolo
+                    options={inputSourceOptions}
+                    value={inputSource}
+                    onInputChange={(event, newValue) =>
+                      setInputSource(newValue)
+                    }
+                    onChange={(event, newValue) => {
+                      if (typeof newValue === "string") {
+                        handleNewInputSource(newValue);
+                        setInputSource(newValue);
+                      } else if (newValue && newValue.inputValue) {
+                        handleNewInputSource(newValue.inputValue);
+                        setInputSource(newValue.inputValue);
+                      } else {
+                        setInputSource(newValue);
+                      }
+                    }}
+                    filterOptions={(options, params) => {
+                      const filtered = filter(options, params);
+                      const { inputValue } = params;
+                      const isExisting = options.some(
+                        (option) => inputValue === option
+                      );
+                      if (inputValue !== "" && !isExisting) {
+                        filtered.push({
+                          inputValue,
+                          title: `Add "${inputValue}"`,
+                        });
+                      }
+                      return filtered;
+                    }}
+                    selectOnFocus
+                    clearOnBlur
+                    handleHomeEndKeys
+                    getOptionLabel={(option) => {
+                      if (typeof option === "string") {
+                        return option;
+                      }
+                      if (option.inputValue) {
+                        return option.inputValue;
+                      }
+                      return option.title;
+                    }}
+                    renderOption={(props, option) => {
+                      const { key, ...optionProps } = props;
+                      return (
+                        <li key={key} {...optionProps}>
+                          {option.title || option}
+                        </li>
+                      );
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Input Source"
+                        margin="normal"
+                        fullWidth
+                        sx={{ flexGrow: 1 }}
+                      />
+                    )}
+                  />
+                </Grid>
+              </Box>
+            </Grid>
 
-              <Grid item xs={9}>
-                <Autocomplete
-                  fullWidth
-                  freeSolo
-                  options={entityImpactedOpt}
-                  value={entityImpacted}
-                  onInputChange={(event, newValue) =>
-                    setEntityImpacted(newValue)
-                  }
-                  onChange={(event, newValue) => {
-                    if (typeof newValue === "string") {
-                      handleNewEntity(newValue);
-                      setEntityImpacted(newValue);
-                    } else if (newValue && newValue.inputValue) {
-                      handleNewEntity(newValue.inputValue);
-                      setEntityImpacted(newValue.inputValue);
-                    } else {
-                      setEntityImpacted(newValue);
-                    }
-                  }}
-                  filterOptions={(options, params) => {
-                    const filtered = filter(options, params);
-                    const { inputValue } = params;
-                    const isExisting = options.some(
-                      (option) => inputValue === option
-                    );
-                    if (inputValue !== "" && !isExisting) {
-                      filtered.push({
-                        inputValue,
-                        title: `Add "${inputValue}"`,
-                      });
-                    }
-                    return filtered;
-                  }}
-                  selectOnFocus
-                  clearOnBlur
-                  handleHomeEndKeys
-                  getOptionLabel={(option) => {
-                    if (typeof option === "string") {
-                      return option;
-                    }
-                    if (option.inputValue) {
-                      return option.inputValue;
-                    }
-                    return option.title;
-                  }}
-                  renderOption={(props, option) => {
-                    const { key, ...optionProps } = props;
-                    return (
-                      <li key={key} {...optionProps}>
-                        {option.title || option}
-                      </li>
-                    );
-                  }}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label="Entity Impacted"
-                      margin="normal"
-                      fullWidth
-                      sx={{ flexGrow: 1 }}
+            {/* date of input */}
+            <Grid item xs={12}>
+              <Box
+                className="flex"
+                sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}
+              >
+                <Grid item xs={3}>
+                  <Typography variant="h6">Date of Input:</Typography>
+                </Grid>
+
+                <Grid item xs={9}>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DatePicker
+                      value={dateOfInput ? dayjs(dateOfInput) : null} // Ensure the date is handled correctly
+                      onChange={(newValue) => {
+                        // Ensure newValue is valid before formatting
+                        if (newValue) {
+                          const formattedDate =
+                            dayjs(newValue).format("YYYY-MM-DD");
+                          setDateOfInput(formattedDate);
+                        } else {
+                          setDateOfInput(null); // Handle the case where newValue is null
+                        }
+                      }}
+                      format="DD/MM/YYYY"
                     />
-                  )}
-                />
-              </Grid>
-            </Box>
+                  </LocalizationProvider>
+                </Grid>
+              </Box>
+            </Grid>
+
+            {/* Entity Impacted */}
+            <Grid item xs={12}>
+              <Box
+                className="flex"
+                sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}
+              >
+                <Grid item xs={3}>
+                  <Typography variant="h6">Entity Impacted:</Typography>
+                </Grid>
+
+                <Grid item xs={9}>
+                  <Autocomplete
+                    fullWidth
+                    freeSolo
+                    options={entityImpactedOpt}
+                    value={entityImpacted}
+                    onInputChange={(event, newValue) =>
+                      setEntityImpacted(newValue)
+                    }
+                    onChange={(event, newValue) => {
+                      if (typeof newValue === "string") {
+                        handleNewEntity(newValue);
+                        setEntityImpacted(newValue);
+                      } else if (newValue && newValue.inputValue) {
+                        handleNewEntity(newValue.inputValue);
+                        setEntityImpacted(newValue.inputValue);
+                      } else {
+                        setEntityImpacted(newValue);
+                      }
+                    }}
+                    filterOptions={(options, params) => {
+                      const filtered = filter(options, params);
+                      const { inputValue } = params;
+                      const isExisting = options.some(
+                        (option) => inputValue === option
+                      );
+                      if (inputValue !== "" && !isExisting) {
+                        filtered.push({
+                          inputValue,
+                          title: `Add "${inputValue}"`,
+                        });
+                      }
+                      return filtered;
+                    }}
+                    selectOnFocus
+                    clearOnBlur
+                    handleHomeEndKeys
+                    getOptionLabel={(option) => {
+                      if (typeof option === "string") {
+                        return option;
+                      }
+                      if (option.inputValue) {
+                        return option.inputValue;
+                      }
+                      return option.title;
+                    }}
+                    renderOption={(props, option) => {
+                      const { key, ...optionProps } = props;
+                      return (
+                        <li key={key} {...optionProps}>
+                          {option.title || option}
+                        </li>
+                      );
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Entity Impacted"
+                        margin="normal"
+                        fullWidth
+                        sx={{ flexGrow: 1 }}
+                      />
+                    )}
+                  />
+                </Grid>
+              </Box>
+            </Grid>
+
+            {/* category */}
+            <Grid item xs={12}>
+              <Box
+                className="flex"
+                sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}
+              >
+                <Grid item xs={3}>
+                  <Typography variant="h6">Category:</Typography>
+                </Grid>
+                <Grid item xs={9}>
+                  <TextField
+                    select
+                    label="Category"
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    margin="normal"
+                    fullWidth
+                    sx={{ flexGrow: 1 }}
+                  >
+                    <MenuItem value="CII">CII</MenuItem>
+                    <MenuItem value="Non-CII">Non-CII</MenuItem>
+                  </TextField>
+                </Grid>
+              </Box>
+            </Grid>
+
+            {/* brief */}
+            <Grid item xs={12}>
+              <Box
+                className="flex"
+                sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}
+              >
+                <Grid item xs={3}>
+                  <Typography variant="h6">Brief:</Typography>
+                </Grid>
+                <Grid item xs={9}>
+                  <TextareaAutosize
+                    placeholder="Brief"
+                    minRows={2}
+                    maxRows={2000}
+                    style={{
+                      width: "100%",
+                      border: "1px solid black",
+                      borderRadius: "4px",
+                      padding: "8px",
+                      boxSizing: "border-box",
+                      transition: "border-color 0.3s",
+                      outline: "none",
+                    }}
+                    onFocus={(e) => (e.target.style.borderColor = "#12a1c0")}
+                    onBlur={(e) => (e.target.style.borderColor = "black")}
+                    value={brief}
+                    onChange={(e) => setBrief(e.target.value)}
+                  />
+                </Grid>
+              </Box>
+            </Grid>
+
+            {/* comments */}
+            <Grid item xs={12}>
+              <Box
+                className="flex"
+                sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}
+              >
+                <Grid item xs={3}>
+                  <Typography variant="h6">Initial Comments:</Typography>
+                </Grid>
+                <Grid item xs={9}>
+                  <TextareaAutosize
+                    placeholder="Comment"
+                    minRows={2}
+                    maxRows={2000}
+                    style={{
+                      width: "100%",
+                      border: "1px solid black",
+                      borderRadius: "4px",
+                      padding: "8px",
+                      boxSizing: "border-box",
+                      transition: "border-color 0.3s",
+                      outline: "none",
+                    }}
+                    onFocus={(e) => (e.target.style.borderColor = "#12a1c0")}
+                    onBlur={(e) => (e.target.style.borderColor = "black")}
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                  />
+                </Grid>
+              </Box>
+            </Grid>
           </Grid>
 
-          {/* category */}
-          <Grid item xs={12}>
-            <Box
-              className="flex"
-              sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}
+          <div className="flex justify-end">
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              sx={{
+                mt: 2,
+                mb: 14,
+                backgroundColor: "#12a1c0",
+                color: "#fff",
+                "&:hover": {
+                  backgroundColor: "#0F839D",
+                },
+              }}
+              onClick={() => setTimeOfAction(new Date().toISOString())}
             >
-              <Grid item xs={3}>
-                <Typography variant="h6">Category:</Typography>
-              </Grid>
-              <Grid item xs={9}>
-                <TextField
-                  select
-                  label="Category"
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                  margin="normal"
-                  fullWidth
-                  sx={{ flexGrow: 1 }}
-                >
-                  <MenuItem value="CII">CII</MenuItem>
-                  <MenuItem value="Non-CII">Non-CII</MenuItem>
-                </TextField>
-              </Grid>
-            </Box>
-          </Grid>
-
-          {/* brief */}
-          <Grid item xs={12}>
-            <Box
-              className="flex"
-              sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}
-            >
-              <Grid item xs={3}>
-                <Typography variant="h6">Brief:</Typography>
-              </Grid>
-              <Grid item xs={9}>
-                <TextareaAutosize
-                  placeholder="Brief"
-                  minRows={2}
-                  maxRows={2000}
-                  style={{
-                    width: "100%",
-                    border: "1px solid black",
-                    borderRadius: "4px",
-                    padding: "8px",
-                    boxSizing: "border-box",
-                    transition: "border-color 0.3s",
-                    outline: "none",
-                  }}
-                  onFocus={(e) => (e.target.style.borderColor = "#12a1c0")}
-                  onBlur={(e) => (e.target.style.borderColor = "black")}
-                  value={brief}
-                  onChange={(e) => setBrief(e.target.value)}
-                />
-              </Grid>
-            </Box>
-          </Grid>
-
-          {/* comments */}
-          <Grid item xs={12}>
-            <Box
-              className="flex"
-              sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}
-            >
-              <Grid item xs={3}>
-                <Typography variant="h6">Initial Comments:</Typography>
-              </Grid>
-              <Grid item xs={9}>
-                <TextareaAutosize
-                  placeholder="Comment"
-                  minRows={2}
-                  maxRows={2000}
-                  style={{
-                    width: "100%",
-                    border: "1px solid black",
-                    borderRadius: "4px",
-                    padding: "8px",
-                    boxSizing: "border-box",
-                    transition: "border-color 0.3s",
-                    outline: "none",
-                  }}
-                  onFocus={(e) => (e.target.style.borderColor = "#12a1c0")}
-                  onBlur={(e) => (e.target.style.borderColor = "black")}
-                  value={comment}
-                  onChange={(e) => setComment(e.target.value)}
-                />
-              </Grid>
-            </Box>
-          </Grid>
-        </Grid>
-
-        <div className="flex justify-end">
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            sx={{
-              mt: 2,
-              mb: 14,
-              backgroundColor: "#12a1c0",
-              color: "#fff",
-              "&:hover": {
-                backgroundColor: "#0F839D",
-              },
-            }}
-            onClick={() => setTimeOfAction(new Date().toISOString())}
-          >
-            Submit New Incident
-          </Button>
-        </div>
-      </Box>
-    </div>
+              Submit New Incident
+            </Button>
+          </div>
+        </Box>
+      </div>
+    </>
   );
 }
 
