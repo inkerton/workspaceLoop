@@ -1,9 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Button, Card, CardContent, TextField, Typography } from "@mui/material";
+import {
+  Button,
+  Card,
+  CardContent,
+  TextField,
+  Typography,
+} from "@mui/material";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
-
 
 const FileUploadComponent = ({ incidentNo }) => {
   const [fileCount, setFileCount] = useState(0); // To store the number of files
@@ -12,7 +17,7 @@ const FileUploadComponent = ({ incidentNo }) => {
   const [fileNames, setFileNames] = useState([]); // To store the retrieved file names
   const [retrievedFiles, setRetrievedFiles] = useState([]); // To store the retrieved file data
   const [role, setRole] = useState("");
-  console.log('role',role)
+  console.log("role", role);
 
   const handleGetCookie = () => {
     const cookie = Cookies.get("role");
@@ -78,7 +83,9 @@ const FileUploadComponent = ({ incidentNo }) => {
   // Fetch files associated with the incident
   const handleGetFiles = async () => {
     try {
-      const response = await axios.get(`/api/fileData?incidentNo=${incidentNo}`);
+      const response = await axios.get(
+        `/api/fileData?incidentNo=${incidentNo}`
+      );
       if (response.status === 200) {
         setRetrievedFiles(response.data);
       } else {
@@ -94,6 +101,15 @@ const FileUploadComponent = ({ incidentNo }) => {
     handleGetFiles();
     handleGetCookie();
   }, [incidentNo]);
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based
+    const year = date.getFullYear();
+
+    return `${day}/${month}/${year}`;
+  };
 
   return (
     <div>
@@ -123,21 +139,21 @@ const FileUploadComponent = ({ incidentNo }) => {
         </div>
       ))}
 
-{fileNames.length > 0 && (
-    <>
-      <Typography
-              variant="h6"
+      {fileNames.length > 0 && (
+        <>
+          <Typography
+            variant="h6"
             //   className="p-2"
-              sx={{ fontWeight: "bold", mb: 2 }}
-            >
-              Uploaded Files
-            </Typography>
-      <ul>
-        {fileNames.map((fileName, index) => (
-          <li key={index}>{fileName}</li>
-        ))}
-      </ul>
-      </>
+            sx={{ fontWeight: "bold", mb: 2 }}
+          >
+            Uploaded Files
+          </Typography>
+          <ul>
+            {fileNames.map((fileName, index) => (
+              <li key={index}>{fileName}</li>
+            ))}
+          </ul>
+        </>
       )}
 
       {/* <h3>Retrieved Files</h3>
@@ -163,48 +179,56 @@ const FileUploadComponent = ({ incidentNo }) => {
                 ))}
             </ul> */}
 
-        {role === 'Admin' && retrievedFiles.length > 0 && (
-            <div className="mt-4">
-                <Typography
-              variant="h6"
+      {role === "Admin" && retrievedFiles.length > 0 && (
+        <div className="mt-4">
+          <Typography
+            variant="h6"
             //   className="p-2"
-              sx={{ fontWeight: "bold", mb: 2 }}
-            >
-              Download Files
-            </Typography>
-            {retrievedFiles.map((file, index) => (
-                <Card key={index} sx={{ mb: 2 }}>
-                    <CardContent>
-                        <Typography variant="h6">{file.filename}</Typography>
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            sx={{
-                                backgroundColor: "#12a1c0",
-                                color: "#fff",
-                                "&:hover": {
-                                  backgroundColor: "#0F839D",
-                                },
-                              }}
-                            onClick={() => {
-                                const downloadLink = document.createElement('a');
-                                downloadLink.href = `data:${file.contentType};base64,${btoa(
-                                    new Uint8Array(file.fileData.data).reduce(
-                                        (data, byte) => data + String.fromCharCode(byte),
-                                        ''
-                                    )
-                                )}`;
-                                downloadLink.download = file.filename;
-                                downloadLink.click();
-                            }}
-                        >
-                            Download
-                        </Button>
-                    </CardContent>
-                </Card>
-            ))}
-            </div>
-            )}
+            sx={{ fontWeight: "bold", mb: 2 }}
+          >
+            Download Files
+          </Typography>
+          {retrievedFiles.map((file, index) => (
+            <Card key={index} sx={{ mb: 2 }}>
+              <CardContent>
+                <Typography variant="h6">
+                  {file.filename}
+                  <Typography
+                    variant="body2"
+                    sx={{ color: "gray", fontSize: "0.75rem", marginLeft: 0 }}
+                  >
+                    Uploaded on: {formatDate(file.uploadDate)}
+                  </Typography>
+                </Typography>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  sx={{
+                    backgroundColor: "#12a1c0",
+                    color: "#fff",
+                    "&:hover": {
+                      backgroundColor: "#0F839D",
+                    },
+                  }}
+                  onClick={() => {
+                    const downloadLink = document.createElement("a");
+                    downloadLink.href = `data:${file.contentType};base64,${btoa(
+                      new Uint8Array(file.fileData.data).reduce(
+                        (data, byte) => data + String.fromCharCode(byte),
+                        ""
+                      )
+                    )}`;
+                    downloadLink.download = file.filename;
+                    downloadLink.click();
+                  }}
+                >
+                  Download
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

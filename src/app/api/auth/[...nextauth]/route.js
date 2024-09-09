@@ -4,6 +4,7 @@ import NextAuth from 'next-auth/next';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { useCallback } from 'react';
 import { cookies } from 'next/headers';
+import argon2 from 'argon2';
 
 
 async function login(credentials){
@@ -11,9 +12,16 @@ async function login(credentials){
         dbConnect();
         const user = await User.findOne({username: credentials.username});
         if(!user) throw new Error("Wrong Credentials");
-        if ( credentials.password != user.password) {
-            throw new Error("Wrong Credentials!!!");
-        } 
+        const storedHashedPassword = user.password.toString();
+        console.log('Stored hashed password:', storedHashedPassword);
+        console.log('Provided password:', credentials.password);
+
+        const isPasswordValid = await argon2.verify(storedHashedPassword, credentials.password);
+        console.log('Password valid:', isPasswordValid);
+
+        if (!isPasswordValid) {
+            throw new Error("Wrong Credentials");
+        }
         return user;
     } catch (error) {
         console.log("error while logging in ", error);
@@ -28,7 +36,10 @@ export const authOptions = {
     providers: [
         CredentialsProvider({
             name: "credentials",
-            credentials: {},
+            credentials: {
+                username: { label: "Username", type: "text" },
+                password: { label: "Password", type: "password" }
+            },
             async authorize(credentials) {
                 try {
                     const user = await login(credentials); 
