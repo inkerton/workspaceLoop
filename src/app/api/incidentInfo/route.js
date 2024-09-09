@@ -4,15 +4,6 @@ import IncidentInfo from "@/model/Incident";
 import { NextResponse } from "next/server";
 import ChangeLog from "@/model/ChangeLogs";
 
-export const config = {
-  api: {
-    bodyParser: false, // Disable built-in body parser as we'll use Multer
-  },
-};
-
-// const upload = multer().array("pdfFiles"); // Configure Multer for PDF uploads
-const storage = multer.memoryStorage();
-const upload = multer({ storage }).array("pdfFiles");
 
 // export async function POST(req) {
 //   await dbConnect();
