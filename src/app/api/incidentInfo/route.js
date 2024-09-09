@@ -4,6 +4,7 @@ import IncidentInfo from "@/model/Incident";
 import { NextResponse } from "next/server";
 import ChangeLog from "@/model/ChangeLogs";
 
+
 export async function POST(req) {
   await dbConnect();
 
