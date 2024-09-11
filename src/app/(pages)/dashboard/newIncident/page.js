@@ -627,7 +627,7 @@ function NewIncident() {
                   <TextareaAutosize
                     placeholder="Brief"
                     minRows={2}
-                    maxRows={2000}
+                    maxRows={5000}
                     style={{
                       width: "100%",
                       border: "1px solid black",
@@ -653,13 +653,13 @@ function NewIncident() {
                 sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}
               >
                 <Grid item xs={3}>
-                  <Typography variant="h6">Initial Comments:</Typography>
+                  <Typography variant="h6">Initial Comment:</Typography>
                 </Grid>
                 <Grid item xs={9}>
                   <TextareaAutosize
                     placeholder="Comment"
                     minRows={2}
-                    maxRows={2000}
+                    maxRows={5000}
                     style={{
                       width: "100%",
                       border: "1px solid black",

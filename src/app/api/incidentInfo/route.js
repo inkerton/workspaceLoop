@@ -10,22 +10,6 @@ export async function POST(req) {
 
   // Handle potential errors during file upload
   try {
-    await new Promise((resolve, reject) => {
-      upload(req, null, (err) => {
-        if (err) {
-          console.error("Error uploading files:", err);
-          return NextResponse.json(
-            { message: "Error processing files" },
-            { status: 500 }
-          );
-        } else {
-          resolve();
-        }
-      });
-    });
-
-    // Access uploaded files and form data
-    const allpdf = req.files || [];
 
     const formData = await req.formData();
 
