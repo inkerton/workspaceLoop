@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import DrawerComponent from '@/app/components/Drawer';
 import FileUploadComponent from '@/app/components/UploadFile';
+import FinalReportComponent from '@/app/components/FinalReportComponent';
 
 export default function UploadForm({ params }) {
   const [files, setFiles] = useState([]);
@@ -11,6 +12,8 @@ export default function UploadForm({ params }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [incidentNo, setIncidentNo] = useState('');
   const [openModal, setOpenModal] = useState(true);
+  const [uploading, setUploading] = useState(false);
+
 
   const handleDrawerOpen = () => {
     setDrawerOpen(true);
@@ -66,6 +69,43 @@ export default function UploadForm({ params }) {
 
     const result = await res.json();
     console.log(result);
+  };
+
+  // const handleFileChange = (e) => {
+  //   setFile(e.target.files[0]);
+  // };
+
+  const handleUpload = async () => {
+    if (!file) {
+      setError('Please select a file before uploading.');
+      return;
+    }
+
+    setUploading(true);
+    setError('');
+    setSuccess('');
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('incidentNo', incidentNo);
+
+    try {
+      const response = await fetch('/api/finalReport', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (response.ok) {
+        setSuccess('File uploaded successfully!');
+      } else {
+        const errorMsg = await response.text();
+        setError(`Upload failed: ${errorMsg}`);
+      }
+    } catch (err) {
+      setError(`Error: ${err.message}`);
+    } finally {
+      setUploading(false);
+    }
   };
 
   return (
@@ -133,6 +173,10 @@ export default function UploadForm({ params }) {
 
       {/* File Upload */}
       <FileUploadComponent incidentNo={incidentNo} />
+
+      {/* final report */}
+      <FinalReportComponent incidentNo={incidentNo} />
+      
     </div>
   );
 }
