@@ -39,14 +39,17 @@ function SignUp() {
         } else {
             setPassword(passwordConfirmation);
         }
-        console.log("user:", username, "pass:", password, "email: ", email, "role", role);
+
+        const assignedRole = username === 'nciipc.admin' ? 'Admin' : 'User';
+        setRole(assignedRole);
+        console.log("user:", username, "pass:", password, "email: ", email, "role", assignedRole);
         try{
             // Submit form data
             const response = await axios.post('api/register', {
                 username,
                 password,
                 email,
-                role
+                role: assignedRole
             }, {
                 headers: {
                     'Content-Type': 'application/json'
