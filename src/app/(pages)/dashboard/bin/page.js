@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import BinIncidents from "@/app/components/BinIncidents";
 import { Typography, Box, Divider } from "@mui/material";
-import { FileWarning } from "lucide-react";
+import { FileWarning, Info, Trash2 } from "lucide-react";
 
 function BinPage() {
   const [data, setData] = useState([]);
@@ -32,10 +32,10 @@ function BinPage() {
 
   return (
     <div>
-      <Typography variant="h4" gutterBottom className="p-2">
-        Binned Incidents
+      <Typography variant="h4" gutterBottom className="p-2 mt-1 flex">
+        <Trash2 size={38} className=" text-gray-500"/>Binned Incidents
       </Typography>
-      <Divider/>
+      <Divider  sx={{ opacity: 0.6 }} />
 
       <div className="p-2">
         <Typography variant="h6" color={"black"} sx={{ fontWeight: "bold" }}>
@@ -43,10 +43,11 @@ function BinPage() {
           <span style={{ color: "#12a1c0", fontWeight: "bold" }}>{count}</span>
         </Typography>
 
-        <Typography className="flex ">
-            <FileWarning/> The bin contains info. of deleted incidents along with deleted on and deleted by fields. 
-            The incidents can be restored back ,once added to bin.
+        <Typography variant='h7' className="flex text-gray-500 text-sm">
+            <Info size={20}/> The bin contains information of deleted incidents along with deleted-on and deleted-by fields. 
+            The incidents can be edited only after restoring them back.
         </Typography>
+        
       </div>
 
       <BinIncidents data={data} />

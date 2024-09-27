@@ -33,6 +33,7 @@ import { Editor } from "@toast-ui/react-editor";
 import { toast } from "react-toastify";
 import Cookies from "js-cookie";
 import FileUploadComponent from "@/app/components/UploadFile";
+import FinalReportComponent from "@/app/components/FinalReportComponent";
 
 function page({ params }) {
   const router = useRouter();
@@ -599,20 +600,7 @@ function page({ params }) {
                         </Grid>
 
                         <Grid item xs={9}>
-                          <input
-                            type="file"
-                            accept=".pdf, .docx"
-                            onChange={handlesingleFileChange}
-                            style={{
-                              marginBottom: "1rem",
-                            }}
-                          />
-                          <List>
-                            {/* {pdfFiles.map((file, index) => (
-                                                        <ListItem key={index}>{file.name}</ListItem>
-                                                    ))} */}
-                            <ListItem>{finalReport}</ListItem>
-                          </List>
+                          <FinalReportComponent incidentNo={incidentNo}/>
                         </Grid>
                       </Box>
                     </Grid>
